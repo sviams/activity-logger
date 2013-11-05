@@ -1,0 +1,10 @@
+extends layout
+
+block content
+    div(class='container' style='background-color:blue')
+        div(class='row')
+            div(class='col-md-3' style='background-color:#ffdcdc')
+                h1= title
+                p Welcome to #{title}
+                p This is #{whatever}
+                a(href='/admin') Admin

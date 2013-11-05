@@ -1,0 +1,66 @@
+extends layout
+
+block content
+    div(class='container')
+        div(class='row')
+            div(class='col-md-1 col-md-offset-4' style='background-color:#ffdcdc')
+                p Users
+            div(class='col-md-1' style='background-color:#dcffdc')
+                p DB
+            div(class='col-md-1' style='background-color:#dcdcff')
+                p Permissions
+            div(class='col-md-1' style='background-color:#ffdcff')
+                p Status
+        div(class='row' ng-controller='UserListCtrl')
+            div(class='col-md-6')
+                h4 There are currently {{users.length}} users:
+                table(class='table table-hover')
+                    thead
+                        td #
+                        td Username
+                        td Email
+                        td Name
+                        td Role
+                    tbody(ng-repeat='user in users')
+                        tr(ng-click="setCurrentUser(user)")
+                            td {{$index}}
+                            td {{user.username}}
+                            td {{user.email}}
+                            td {{user.firstName}} {{user.lastName}}
+                            td {{user.role}}
+                button(class='btn btn-default', ng-click='newUser()') New
+            div(class='col-md-6' ng-show='currentUser')
+                form(class='form-horizontal' name="myForm")
+                    div(class='form-group')
+                        label(class='col-md-3') Username:
+                        div(class='col-md-6')
+                            input(type='text', class='form-control', name='username', ng-model="currentUser.username", value='{{currentUser.username}}' required)
+                            span(class="error" ng-show="myForm.username.$error.required") Required!
+                    div(class='form-group')
+                        label(class='col-md-3') First name:
+                        div(class='col-md-6')
+                            input(type='text', class='form-control', name='firstname', ng-model="currentUser.firstName", value='{{currentUser.firstName}}')
+                    div(class='form-group')
+                        label(class='col-md-3') Last name:
+                        div(class='col-md-6')
+                            input(type='text', class='form-control', name='lastname', ng-model="currentUser.lastName", value='{{currentUser.lastName}}')
+                    div(class='form-group')
+                        label(class='col-md-3') Email:
+                        div(class='col-md-6')
+                            input(type='email', class='form-control', name='email', ng-model="currentUser.email", value='{{currentUser.email}}')
+                    div(class='form-group')
+                        label(class='col-md-3') Password:
+                        div(class='col-md-6')
+                            input(type='password', class='form-control', name='password', ng-model="currentUser.password", value='{{currentUser.password}}')
+                    div(class='form-group')
+                        label(class='col-md-3') Role:
+                        div(class='col-md-6')
+                            select(class='form-control', name='role', ng-model="currentUser.role", value='{{currentUser.role}}')
+                                option(value='0') Admin
+                                option(value='1') Manager
+                                option(value='2') User
+                    div(class='form-group')
+                        div(class='col-md-3')
+                        div(class='col-md-6')
+                            button(class='btn btn-default', ng-click='saveCurrentUser()') Save
+                            button(class='btn btn-default', ng-click='cancelCurrentUser()') Cancel

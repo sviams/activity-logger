@@ -1,0 +1,12 @@
+block header
+    div(class='container' style='background-color:#6b6b6b')
+        div(class='row')
+            div(class='col-md-4')
+                h3= title
+            div(class='col-md-4 col-md-offset-4')
+                if user
+                    p Welcome #{user.firstName}!
+                if user
+                    a(href='/logout') Log out
+                else
+                    a(href='/login') Log in
