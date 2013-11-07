@@ -18,15 +18,18 @@ alControllers.controller('UserListCtrl', ['$scope', 'User', function($scope, Use
     }
 
     $scope.saveCurrentUser = function() {
-        $scope.currentUser.$save();
-        $scope.users = User.list();
-        $scope.isNewUser = false;
+        if ($scope.currentUser) {
+            $scope.currentUser.$save();
+            $scope.users = User.list();
+            $scope.isNewUser = false;
+        }
     }
 
     $scope.cancelCurrentUser = function() {
         console.log('Cancel editing current user');
         if ($scope.isNewUser) $scope.users.pop();
-        $scope.currentUser = null;
+        $scope.isNewUser = false;
+        $scope.currentUser = undefined;
     }
 
 }]);
