@@ -1,7 +1,7 @@
 'use strict';
 
 /* jasmine specs for controllers go here */
-describe('ActivityLogger controllers', function() {
+describe('ActivityLogger controller', function() {
 
   beforeEach(function() {
       this.addMatchers({
@@ -15,23 +15,30 @@ describe('ActivityLogger controllers', function() {
   beforeEach(module('ActivityLoggerServices'));
 
   describe('UserListCtrl', function(){
-    var scope, ctrl, $httpBackend;
+    var $rootScope, $httpBackend, createController;
 
-    beforeEach(inject(function(_$httpBackend_, $rootScope, $controller) {
-      $httpBackend = _$httpBackend_;
-      $httpBackend.expectGET('/users').
+    beforeEach(inject(function($injector) {
+      $httpBackend = $injector.get('$httpBackend');
+      $httpBackend.when('GET', '/users').
           respond([{name: 'admin'}, {name: 'andersj'}]);
 
-      scope = $rootScope.$new();
-      ctrl = $controller('UserListCtrl', {$scope: scope});
+      $rootScope = $injector.get('$rootScope');
+
+      var $controller = $injector.get('$controller');
+      createController = function() {
+          return $controller('UserListCtrl', {'$scope': $rootScope});
+      }
     }));
 
 
     it('should create "users" model with 2 users fetched from xhr', function() {
-      expect(scope.users).toEqual([]);
+      expect($rootScope.users).not.toBeDefined();
+
+      $httpBackend.expectGET('/users');
+      var controller = createController();
       $httpBackend.flush();
 
-      expect(scope.users).toEqualData(
+      expect($rootScope.users).toEqualData(
           [{name: 'admin'}, {name: 'andersj'}]);
     });
 
