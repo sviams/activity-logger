@@ -2,21 +2,25 @@
 
 /* http://docs.angularjs.org/guide/dev_guide.e2e-testing */
 
-describe('PhoneCat App', function() {
+describe('ActivityLogger', function() {
 
-  it('should redirect index.html to index.html#/phones', function() {
-    browser().navigateTo('../../app/index.html');
-    expect(browser().location().url()).toBe('/phones');
-  });
-
-
-  describe('Phone list view', function() {
-
-    beforeEach(function() {
-      browser().navigateTo('../../app/index.html#/phones');
+    it('should redirect /admin to /login if not logged in', function() {
+        browser().navigateTo('../../public/index.html');
+        expect(browser().location().url()).toBe('/login');
     });
 
+    it('should redirect / to /login if not logged in', function() {
+        browser().navigateTo('/');
+        expect(browser().location().url()).toBe('/login');
+    });
 
+  describe('login view', function() {
+
+    beforeEach(function() {
+      browser().navigateTo('/login');
+    });
+
+    /*
     it('should filter the phone list as user types into the search box', function() {
       expect(repeater('.phones li').count()).toBe(20);
 
@@ -75,5 +79,9 @@ describe('PhoneCat App', function() {
       element('.phone-thumbs li:nth-child(1) img').click();
       expect(element('img.phone').attr('src')).toBe('img/phones/nexus-s.0.jpg');
     });
+  */
+
   });
+
+
 });

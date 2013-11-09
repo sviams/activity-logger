@@ -5,7 +5,7 @@ module.exports = function(config){
     basePath : '../',
 
     files : [
-        'test/e2e/**/*.js'
+       'test/e2e/**/*.js'
     ],
 
     autoWatch : false,
@@ -16,8 +16,10 @@ module.exports = function(config){
 
     singleRun : true,
 
+    urlRoot: '/__e2e/',
+
     proxies : {
-      '/': 'http://localhost:8000/'
+      '/': 'http://localhost:3000/'
     },
 
     plugins : [
