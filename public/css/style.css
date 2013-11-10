@@ -13,3 +13,19 @@ a:hover {
 a:active {
     color: #f1ae2c;
 }
+
+.css-form input.ng-invalid.ng-dirty {
+    background-color: #FA787E;
+}
+
+.css-form input.ng-valid.ng-dirty {
+    background-color: #78FA89;
+}
+
+.flat-panel-button {
+    background-color: #6b6b6b;
+}
+
+.flat-panel-button:hover {
+    background-color: #8c8c8c;
+}

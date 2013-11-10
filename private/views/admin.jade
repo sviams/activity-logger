@@ -3,14 +3,16 @@ extends layout
 block content
     div(class='container')
         div(class='row')
-            div(class='col-md-1 col-md-offset-4' style='background-color:#ffdcdc')
-                p Users
-            div(class='col-md-1' style='background-color:#dcffdc')
-                p DB
-            div(class='col-md-1' style='background-color:#dcdcff')
-                p Permissions
-            div(class='col-md-1' style='background-color:#ffdcff')
-                p Status
+            a(href="/users")
+                div(class='col-md-1 col-md-offset-4 flat-panel-button')
+                    p(class='text-center') Users
+            div(class='col-md-1 flat-panel-button')
+                p(class='text-center') DB
+            div(class='col-md-1 flat-panel-button')
+                p(class='text-center') Permissions
+            div(class='col-md-1 flat-panel-button')
+                p(class='text-center') Status
+        br
         div(class='row' ng-controller='UserListCtrl')
             div(class='col-md-6')
                 h4 There are currently {{users.length}} users:
@@ -30,24 +32,23 @@ block content
                             td {{user.role}}
                 button(class='btn btn-default', ng-click='newUser()') New
             div(class='col-md-6' ng-show='currentUser')
-                form(class='form-horizontal' name="myForm")
+                form(class='form-horizontal css-form' name="myForm" novalidate)
                     div(class='form-group')
                         label(class='col-md-3') Username:
                         div(class='col-md-6')
                             input(type='text', class='form-control', name='username', ng-model="currentUser.username", value='{{currentUser.username}}' required)
-                            span(class="error" ng-show="myForm.username.$error.required") Required!
                     div(class='form-group')
                         label(class='col-md-3') First name:
                         div(class='col-md-6')
-                            input(type='text', class='form-control', name='firstname', ng-model="currentUser.firstName", value='{{currentUser.firstName}}')
+                            input(type='text', class='form-control', name='firstname', ng-model="currentUser.firstName", value='{{currentUser.firstName}} required')
                     div(class='form-group')
                         label(class='col-md-3') Last name:
                         div(class='col-md-6')
-                            input(type='text', class='form-control', name='lastname', ng-model="currentUser.lastName", value='{{currentUser.lastName}}')
+                            input(type='text', class='form-control', name='lastname', ng-model="currentUser.lastName", value='{{currentUser.lastName}} required')
                     div(class='form-group')
                         label(class='col-md-3') Email:
                         div(class='col-md-6')
-                            input(type='email', class='form-control', name='email', ng-model="currentUser.email", value='{{currentUser.email}}')
+                            input(type='email', class='form-control', name='email', ng-model="currentUser.email", value='{{currentUser.email}}' required)
                     div(class='form-group')
                         label(class='col-md-3') Password:
                         div(class='col-md-6')
@@ -55,12 +56,13 @@ block content
                     div(class='form-group')
                         label(class='col-md-3') Role:
                         div(class='col-md-6')
-                            select(class='form-control', name='role', ng-model="currentUser.role", value='{{currentUser.role}}')
+                            select(class='form-control', name='role', ng-model="currentUser.role", value='{{currentUser.role}}' required)
                                 option(value='0') Admin
                                 option(value='1') Manager
                                 option(value='2') User
                     div(class='form-group')
                         div(class='col-md-3')
                         div(class='col-md-6')
-                            button(class='btn btn-default', ng-click='saveCurrentUser()') Save
-                            button(class='btn btn-default', ng-click='cancelCurrentUser()') Cancel
+                            button(class='btn btn-default', ng-disabled="myForm.$invalid" ng-click='saveCurrentUser();myForm.$setPristine(true);') Save
+                            button(class='btn btn-default', ng-click='cancelCurrentUser();myForm.$setPristine(true);') Cancel
+        br
