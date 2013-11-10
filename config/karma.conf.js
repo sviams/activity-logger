@@ -7,7 +7,7 @@ module.exports = function(config){
       'bower_components/angular-resource/angular-resource.js',
       'test/lib/angular/angular-mocks.js',
       'public/js/**/*.js',
-      'test/unit/**/*.js'
+      'test/unit/client/**/*.js'
     ],
 
     exclude: ['public/js/lib/angular/angular-scenario.js'],

@@ -76,10 +76,9 @@ var User = function() {
 
         newUser.save(function(err, rawData) {
             if (err) {
-                console.log(err);
+                //console.log(err);
                 return onError(err);
             } else {
-                console.log('User ' + rawData + ' saved');
                 return onSuccess(rawData);
             }
         });
@@ -88,7 +87,7 @@ var User = function() {
     function _doUpdateUser(userId, user, onSuccess, onError) {
         _model.update({ _id: userId}, user, { upsert: true }, function(err, numberAffected, rawData) {
             if (err) {
-                console.log(err);
+                //console.log(err);
                 onError(err);
             } else {
                 onSuccess(rawData);
@@ -126,6 +125,7 @@ var User = function() {
     }
 
     return {
+        model: _model,
         Role: _userRoles,
         list: _listUsers,
         add: _addUser,
