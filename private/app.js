@@ -9,7 +9,8 @@ var routes = require('./routes');
 var http = require('http');
 var path = require('path');
 var mongoose = require('mongoose');
-var User = require('./model/userModel');
+var UserRepo = require('./model/userRepo');
+var User = require('./model/user');
 var LocalStrategy = require('passport-local').Strategy;
 
 var app = express();
@@ -41,7 +42,9 @@ db.once('open', function callback() {
 
 // Connect function for ensuring authorization before access
 function authRequired(req, res, next) {
-    if (req.isAuthenticated()) return next();
+    if (req.isAuthenticated()) {
+        return next();
+    }
     res.redirect('/login');
 }
 
@@ -50,22 +53,27 @@ function authRequired(req, res, next) {
 // Connect function for ensuring that the user has the correct role
 function restrictedToRole(role) {
     return function(req, res, next) {
-        if (req.user.role <= role) next();
-        else {
+        if (req.user.role <= role) {
+            next();
+        } else {
             console.log('User role is ' + req.user.role + ' and requirement is ' + role);
             next(new Error('Insufficient permissions'));
         }
-    }
+    };
 }
 
 // set up passport
 passport.use(new LocalStrategy(function(username, password, done) {
-    User.find({username: username}, function(user) {
-        user.comparePassword(password, function(err, isMatch) {
-            if (err) return done(err);
+    UserRepo.find({username: username}, function(user) {
+        User.comparePassword(user, password, function(err, isMatch) {
+            if (err) {
+                return done(err);
+            }
+
             if(isMatch) {
                 console.log('Accepted password for ' + username);
                 return done(null, user);
+
             } else {
                 return done(null, false, { message: 'Invalid password' });
             }
@@ -80,7 +88,7 @@ passport.serializeUser(function(user, done) {
 });
 
 passport.deserializeUser(function(id, done) {
-    User.getById(id, function(user) {
+    UserRepo.getById(id, function(user) {
         done(undefined, user);
     }, function(err) {
         done(err, undefined);
@@ -93,14 +101,26 @@ var authFunction = passport.authenticate('local', {
 });
 
 // development only
-if ('development' == app.get('env')) {
+if ('development' === app.get('env')) {
   app.use(express.errorHandler());
 }
 
+console.log(User.Roles);
+
+
+
+// Seed the database with default data
+UserRepo.deleteAll(function() {
+    UserRepo.seedUser(new User(undefined, 'admin', 'changeme', 'System', 'Admin', 'admin@invalid', User.Roles.Admin));
+    UserRepo.seedUser(new User(undefined, 'jimmy', 'changeme', 'Jimmy', 'Nilsson', 'jimmy@factor10.com', User.Roles.Manager));
+    UserRepo.seedUser(new User(undefined, 'anders', 'changeme', 'Anders', 'Jändel', 'anders@factor10.com', User.Roles.Consultant));
+});
+
+
 app.get('/login', routes.login);
-app.get('/', authRequired, restrictedToRole(User.Role.User), routes.index);
-//app.get('/users', authRequired, restrictedToRole(Users.Role.Manager), Users.list);
-app.get('/admin', authRequired, restrictedToRole(User.Role.Admin),routes.admin);
+app.get('/', authRequired, restrictedToRole(User.Roles.Consultant), routes.index);
+//app.get('/users', authRequired, restrictedToRole(User.Roles.Manager), Users.list);
+app.get('/admin', authRequired, restrictedToRole(User.Roles.Admin),routes.admin);
 app.post('/login', authFunction);
 app.get('/logout', function (req, res){
     req.session.destroy(function (err) {
@@ -109,32 +129,32 @@ app.get('/logout', function (req, res){
 });
 
 
-app.post('/users/:userId', authRequired, restrictedToRole(User.Role.Admin), function(req, res) {
-    User.update(req.body, function(jsonData) {
+app.post('/users/:userId', authRequired, restrictedToRole(User.Roles.Admin), function(req, res) {
+    UserRepo.update(req.body, function(jsonData) {
         res.json(201, jsonData);
     }, function(error) {
         res.send(500, error);
     });
 });
 
-app.post('/users', authRequired, restrictedToRole(User.Role.Admin), function(req, res) {
-    User.add(req.body, function(jsonData) {
+app.post('/users', authRequired, restrictedToRole(User.Roles.Admin), function(req, res) {
+    UserRepo.add(req.body, function(jsonData) {
         res.json(200, jsonData);
     }, function(error) {
         res.send(500, error);
     });
 });
 
-app.get('/users/:userId', authRequired, restrictedToRole(User.Role.Admin), function(req, res) {
-    User.getById(function(jsonData) {
+app.get('/users/:userId', authRequired, restrictedToRole(User.Roles.Admin), function(req, res) {
+    UserRepo.getById(function(jsonData) {
         res.json(200, jsonData);
     }, function(error) {
         res.send(500, error);
     });
 });
 
-app.get('/users', authRequired, restrictedToRole(User.Role.Admin), function(req, res) {
-    User.list(function(jsonData) {
+app.get('/users', authRequired, restrictedToRole(User.Roles.Admin), function(req, res) {
+    UserRepo.list(function(jsonData) {
         res.json(200, jsonData);
     }, function(error) {
         res.send(500, error);

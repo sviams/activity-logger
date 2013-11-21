@@ -28,7 +28,7 @@ block content
                             td {{$index}}
                             td {{user.username}}
                             td {{user.email}}
-                            td {{user.firstName}} {{user.lastName}}
+                            td {{user.firstname}} {{user.lastname}}
                             td {{user.role}}
                 button(class='btn btn-default', ng-click='newUser()') New
             div(class='col-md-6' ng-show='currentUser')
@@ -36,27 +36,27 @@ block content
                     div(class='form-group')
                         label(class='col-md-3') Username:
                         div(class='col-md-6')
-                            input(type='text', class='form-control', name='username', ng-model="currentUser.username", value='{{currentUser.username}}' required)
+                            input(type='text', class='form-control', name='username', ng-model="currentUser.username" required)
                     div(class='form-group')
                         label(class='col-md-3') First name:
                         div(class='col-md-6')
-                            input(type='text', class='form-control', name='firstname', ng-model="currentUser.firstName", value='{{currentUser.firstName}} required')
+                            input(type='text', class='form-control', name='firstname', ng-model="currentUser.firstname" required)
                     div(class='form-group')
                         label(class='col-md-3') Last name:
                         div(class='col-md-6')
-                            input(type='text', class='form-control', name='lastname', ng-model="currentUser.lastName", value='{{currentUser.lastName}} required')
+                            input(type='text', class='form-control', name='lastname', ng-model="currentUser.lastname" required)
                     div(class='form-group')
                         label(class='col-md-3') Email:
                         div(class='col-md-6')
-                            input(type='email', class='form-control', name='email', ng-model="currentUser.email", value='{{currentUser.email}}' required)
+                            input(type='email', class='form-control', name='email', ng-model="currentUser.email" required)
                     div(class='form-group')
                         label(class='col-md-3') Password:
                         div(class='col-md-6')
-                            input(type='password', class='form-control', name='password', ng-model="currentUser.password", value='{{currentUser.password}}')
+                            input(type='password', class='form-control', name='password', ng-model="currentUser.password")
                     div(class='form-group')
                         label(class='col-md-3') Role:
                         div(class='col-md-6')
-                            select(class='form-control', name='role', ng-model="currentUser.role", value='{{currentUser.role}}' required)
+                            select(class='form-control', name='role', ng-model="currentUser.role" required)
                                 option(value='0') Admin
                                 option(value='1') Manager
                                 option(value='2') User

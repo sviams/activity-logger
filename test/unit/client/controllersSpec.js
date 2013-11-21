@@ -27,7 +27,7 @@ describe('ActivityLogger controller', function() {
       var $controller = $injector.get('$controller');
       createController = function() {
           return $controller('UserListCtrl', {'$scope': $rootScope});
-      }
+      };
     }));
 
 
@@ -86,20 +86,47 @@ describe('ActivityLogger controller', function() {
 
     });
 
-    it('should cancel the currently edited user', function() {
-        $httpBackend.expectGET('/users').respond([{name: 'admin'}, {name: 'andersj'}]);
-        var controller = createController();
-        $httpBackend.flush();
+      it('should do nothing if there is no current user', function() {
+          $httpBackend.expectGET('/users').respond([{name: 'admin'}, {name: 'andersj'}]);
+          var controller = createController();
+          $httpBackend.flush();
 
-        $rootScope.newUser();
+          $rootScope.saveCurrentUser();
 
-        $rootScope.cancelCurrentUser();
+          expect($rootScope.users.length).toEqual(2);
+          expect($rootScope.isNewUser).toBeFalsy();
+          expect($rootScope.users[1].name).toEqual('andersj');
 
-        expect($rootScope.users.length).toEqual(2);
-        expect($rootScope.isNewUser).toBeFalsy();
-        expect($rootScope.currentUser).toBeUndefined();
 
-    });
+      });
+
+      it('should cancel the currently edited new user', function() {
+          $httpBackend.expectGET('/users').respond([{name: 'admin'}, {name: 'andersj'}]);
+          var controller = createController();
+          $httpBackend.flush();
+
+          $rootScope.newUser();
+
+          $rootScope.cancelCurrentUser();
+
+          expect($rootScope.users.length).toEqual(2);
+          expect($rootScope.isNewUser).toBeFalsy();
+          expect($rootScope.currentUser).toBeUndefined();
+
+      });
+
+      it('should cancel the currently edited user', function() {
+          $httpBackend.expectGET('/users').respond([{name: 'admin'}, {name: 'andersj'}]);
+          var controller = createController();
+          $httpBackend.flush();
+
+          $rootScope.cancelCurrentUser();
+
+          expect($rootScope.users.length).toEqual(2);
+          expect($rootScope.isNewUser).toBeFalsy();
+          expect($rootScope.currentUser).toBeUndefined();
+
+      });
 
   });
 

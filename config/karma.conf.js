@@ -1,33 +1,45 @@
 module.exports = function(config){
     config.set({
-    basePath : '../',
+        basePath : '../',
 
-    files : [
-      'bower_components/angular/angular.js',
-      'bower_components/angular-resource/angular-resource.js',
-      'test/lib/angular/angular-mocks.js',
-      'public/js/**/*.js',
-      'test/unit/client/**/*.js'
-    ],
+        preprocessors: {
+            'public/js/**/*.js' : 'coverage'
+        },
 
-    exclude: ['public/js/lib/angular/angular-scenario.js'],
+        files : [
+          'bower_components/angular/angular.js',
+          'bower_components/angular-resource/angular-resource.js',
+          'test/lib/angular/angular-mocks.js',
+          'public/js/**/*.js',
+          'test/unit/client/**/*.js'
+        ],
 
-    autoWatch : true,
+        exclude: ['public/js/lib/angular/angular-scenario.js'],
 
-    frameworks: ['jasmine'],
+        autoWatch : true,
 
-    browsers : ['Chrome'],
+        frameworks: ['jasmine'],
 
-    plugins : [
-      'karma-junit-reporter',
-      'karma-chrome-launcher',
-      'karma-firefox-launcher',
-      'karma-jasmine'
-    ],
+        browsers : ['Chrome'],
 
-    junitReporter : {
-      outputFile: 'test_out/unit.xml',
-      suite: 'unit'
-    }
+        plugins : [
+          'karma-coverage',
+          'karma-junit-reporter',
+          'karma-chrome-launcher',
+          'karma-firefox-launcher',
+          'karma-jasmine'
+        ],
+
+        junitReporter : {
+          outputFile: 'test_out/unit.xml',
+          suite: 'unit'
+        },
+
+        reporters: ['coverage'],
+
+        coverageReporter: {
+            type: 'html',
+            dir: 'coverage'
+        }
 
 })}
