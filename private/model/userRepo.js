@@ -37,7 +37,7 @@ var UserRepo = (function() {
         UserDbModel.find({ username: user.username, role: user.role}, function(err, userResult) {
             if (err || !userResult || userResult.length === 0) {
                 console.log('Seeding database with user ' + user.username + ' and role ' + user.role);
-                _addUser(user);
+                _addUser(null, null, user);
             } else {
                 console.log('Already had user ' + user.username + ', no need to seed');
             }
@@ -55,7 +55,7 @@ var UserRepo = (function() {
         });
     }
 
-    function _addUser(user, onSuccess, onError) {
+    function _addUser(onSuccess, onError, user) {
         if (!user) {
             return onError('Invalid user!');
         }
@@ -85,7 +85,7 @@ var UserRepo = (function() {
         });
     }
 
-    function _updateUser(user, onSuccess, onError) {
+    function _updateUser(onSuccess, onError, user) {
         if (!user) {
             return onError('Invalid user object');
         }
@@ -104,7 +104,7 @@ var UserRepo = (function() {
         }
     }
 
-    function _getUserById(userId, onSuccess, onError) {
+    function _getUserById(onSuccess, onError, userId) {
         UserDbModel.findById(userId, function(err, doc) {
             if (err || doc === null) {
                 onError(err);
@@ -114,7 +114,7 @@ var UserRepo = (function() {
         });
     }
 
-    function _findUser(searchObj, onSuccess, onError) {
+    function _findUser(onSuccess, onError, searchObj) {
         UserDbModel.findOne(searchObj, function(err, doc) {
             if (err || doc === null) {
                 onError(err);

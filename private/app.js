@@ -64,7 +64,7 @@ function restrictedToRole(role) {
 
 // set up passport
 passport.use(new LocalStrategy(function(username, password, done) {
-    UserRepo.find({username: username}, function(user) {
+    UserRepo.find(function(user) {
         User.comparePassword(user, password, function(err, isMatch) {
             if (err) {
                 return done(err);
@@ -80,7 +80,7 @@ passport.use(new LocalStrategy(function(username, password, done) {
         });
     }, function(error) {
         return done(error);
-    });
+    }, {username: username});
 }));
 
 passport.serializeUser(function(user, done) {
@@ -88,11 +88,11 @@ passport.serializeUser(function(user, done) {
 });
 
 passport.deserializeUser(function(id, done) {
-    UserRepo.getById(id, function(user) {
+    UserRepo.getById(function(user) {
         done(undefined, user);
     }, function(err) {
         done(err, undefined);
-    });
+    }, id);
 });
 
 var authFunction = passport.authenticate('local', {
@@ -128,38 +128,19 @@ app.get('/logout', function (req, res){
     });
 });
 
-
-app.post('/users/:userId', authRequired, restrictedToRole(User.Roles.Admin), function(req, res) {
-    UserRepo.update(req.body, function(jsonData) {
-        res.json(201, jsonData);
-    }, function(error) {
-        res.send(500, error);
-    });
-});
-
-app.post('/users', authRequired, restrictedToRole(User.Roles.Admin), function(req, res) {
-    UserRepo.add(req.body, function(jsonData) {
+var repoCallback = function(res, func, body) {
+    func(function(jsonData) {
         res.json(200, jsonData);
     }, function(error) {
         res.send(500, error);
-    });
-});
+    }, body);
+}
 
-app.get('/users/:userId', authRequired, restrictedToRole(User.Roles.Admin), function(req, res) {
-    UserRepo.getById(function(jsonData) {
-        res.json(200, jsonData);
-    }, function(error) {
-        res.send(500, error);
-    });
-});
+app.post('/users/:userId', authRequired, restrictedToRole(User.Roles.Admin), function(req, res) { repoCallback(res, UserRepo.update, req.body); });
+app.post('/users',         authRequired, restrictedToRole(User.Roles.Admin), function(req, res) { repoCallback(res, UserRepo.add, req.body); });
+app.get('/users/:userId',  authRequired, restrictedToRole(User.Roles.Admin), function(req, res) { repoCallback(res, UserRepo.getById, req.body); });
+app.get('/users',          authRequired, restrictedToRole(User.Roles.Admin), function(req, res) { repoCallback(res, UserRepo.list); });
 
-app.get('/users', authRequired, restrictedToRole(User.Roles.Admin), function(req, res) {
-    UserRepo.list(function(jsonData) {
-        res.json(200, jsonData);
-    }, function(error) {
-        res.send(500, error);
-    });
-});
 
 http.createServer(app).listen(app.get('port'), function(){
     console.log('Express server listening on port ' + app.get('port'));
