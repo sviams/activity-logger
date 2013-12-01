@@ -53,7 +53,7 @@ module.exports.hashPassword = function(user, onSuccess, onFailure) {
     });
 };
 
-module.exports.hashPasswordIfChanged = function(user, next) {
+var hashPasswordIfChanged = function(user, next) {
 
     if(!user.isModified('password')) {
         return next();
@@ -76,4 +76,18 @@ module.exports.comparePassword = function(user, candidatePassword, callback) {
         callback(null, isMatch);
     });
 };
+
+module.exports.Parse = function(data, callback) {
+    if (data === undefined || data === null) return null;
+
+    if (data.username === undefined || data.username === null) return null;
+
+    if (data.prototype !== User)
+        data.prototype = User;
+
+    if (callback !== undefined && callback !== null && data.password)
+        User.hashPassword(data, callback);
+    else
+        return data;
+}
 

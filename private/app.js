@@ -40,27 +40,7 @@ db.once('open', function callback() {
     console.log('Connected to DB');
 });
 
-// Connect function for ensuring authorization before access
-function authRequired(req, res, next) {
-    if (req.isAuthenticated()) {
-        return next();
-    }
-    res.redirect('/login');
-}
 
-
-
-// Connect function for ensuring that the user has the correct role
-function restrictedToRole(role) {
-    return function(req, res, next) {
-        if (req.user.role <= role) {
-            next();
-        } else {
-            console.log('User role is ' + req.user.role + ' and requirement is ' + role);
-            next(new Error('Insufficient permissions'));
-        }
-    };
-}
 
 // set up passport
 passport.use(new LocalStrategy(function(username, password, done) {
@@ -105,9 +85,6 @@ if ('development' === app.get('env')) {
   app.use(express.errorHandler());
 }
 
-console.log(User.Roles);
-
-
 
 // Seed the database with default data
 UserRepo.deleteAll(function() {
@@ -128,18 +105,47 @@ app.get('/logout', function (req, res){
     });
 });
 
-var repoCallback = function(res, func, body) {
-    func(function(jsonData) {
-        res.json(200, jsonData);
-    }, function(error) {
-        res.send(500, error);
-    }, body);
+// Connect function for ensuring authorization before access
+function authRequired(req, res, next) {
+    if (req.isAuthenticated()) {
+        return next();
+    }
+    res.redirect('/login');
 }
 
-app.post('/users/:userId', authRequired, restrictedToRole(User.Roles.Admin), function(req, res) { repoCallback(res, UserRepo.update, req.body); });
-app.post('/users',         authRequired, restrictedToRole(User.Roles.Admin), function(req, res) { repoCallback(res, UserRepo.add, req.body); });
-app.get('/users/:userId',  authRequired, restrictedToRole(User.Roles.Admin), function(req, res) { repoCallback(res, UserRepo.getById, req.body); });
-app.get('/users',          authRequired, restrictedToRole(User.Roles.Admin), function(req, res) { repoCallback(res, UserRepo.list); });
+
+
+// Connect function for ensuring that the user has the correct role
+function restrictedToRole(role) {
+    return function(req, res, next) {
+        if (req.user.role <= role) {
+            next();
+        } else {
+            console.log('User role is ' + req.user.role + ' and requirement is ' + role);
+            next(new Error('Insufficient permissions'));
+        }
+    };
+}
+
+// Reconstitute user object if possible
+function parseUser(req, res, next) {
+    User.Parse(req.body, next);
+}
+
+function execUserRequest(userFunction) {
+    return function (req, res) {
+        userFunction(function(jsonData) {
+            res.json(200, jsonData);
+        }, function(error) {
+            res.send(500, error);
+        }, req.body);
+    }
+}
+
+app.post('/users/:userId', authRequired, restrictedToRole(User.Roles.Admin), parseUser, execUserRequest(UserRepo.update));
+app.post('/users',         authRequired, restrictedToRole(User.Roles.Admin), parseUser, execUserRequest(UserRepo.add));
+app.get('/users/:userId',  authRequired, restrictedToRole(User.Roles.Admin), parseUser, execUserRequest(UserRepo.getById));
+app.get('/users',          authRequired, restrictedToRole(User.Roles.Admin), execUserRequest(UserRepo.list));
 
 
 http.createServer(app).listen(app.get('port'), function(){
