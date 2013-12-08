@@ -1,27 +1,29 @@
 'use strict';
-/*
+
 var mongoose = require('mongoose');
 
-mongoose.connect('mongodb://localhost/test_user');
+mongoose.connect('mongodb://localhost/test_timereg');
 
-var User = require('../../../private/model/user');
-var UserRepo = require('../../../private/model/userRepo');
+var TimeReg = require('../../../private/model/timereg');
+var TimeRegRepo = require('../../../private/model/timeRegRepo');
 
-var validUser = new User(undefined, 'validUserName', 'validPassword', 'validFirstName', 'validLastName', 'valid@email.com', User.Roles.Admin);
+var validTimeReg = new TimeReg(undefined, 'anActivity', 'aUser', '2013-12-05', '120', 'Did some stuff');
 
-describe('User model', function() {
+describe('TimeReg model', function() {
 
+    /*
     afterEach(function(done) {
         UserRepo.deleteAll(function() {
             done();
         });
     });
+    */
 
-    it('should create a new user successfully', function(done) {
+    it('should create a new timereg successfully', function(done) {
 
-        UserRepo.add(validUser, function(successResult) {
+        TimeRegRepo.add(validTimeReg, function(successResult) {
             expect(successResult.id).toBeDefined();
-            expect(successResult.username).toEqual(validUser.username);
+            expect(successResult.activity).toEqual(validTimeReg.activity);
             done();
         }, function(error) {
             console.log(error);
@@ -29,6 +31,7 @@ describe('User model', function() {
         });
     });
 
+    /*
     it('should fail to create a user when missing the email field', function(done) {
 
         var userWithMissingEmail = new User(undefined, 'invalidUserName', 'invalidPassword', 'invalidFirstName', 'invalidLastName', undefined, 99999);
@@ -154,6 +157,6 @@ describe('User model', function() {
         });
 
     });
+    */
 
 });
-*/

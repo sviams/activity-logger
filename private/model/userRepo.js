@@ -15,6 +15,16 @@ var UserRepo = (function() {
         role: { type: Number, required: true}
     });
 
+/*
+    _userSchema.pre('save', function(next) {
+        User.hashPasswordIfChanged(this, next);
+    });
+*/
+    // Password verification
+    _userSchema.methods.comparePassword = function(candidatePassword, callback) {
+        User.comparePassword(this, candidatePassword, callback);
+    };
+
     var UserDbModel =  mongoose.model('User', _userSchema);
 
     function _seedUser(user) {
@@ -24,15 +34,13 @@ var UserRepo = (function() {
             return;
         }
 
-        User.Parse(user, function () {
-            UserDbModel.find({ username: user.username, role: user.role}, function(err, userResult) {
-                if (err || !userResult || userResult.length === 0) {
-                    console.log('Seeding database with user ' + user.username + ' and role ' + user.role);
-                    _addUser(null, null, user);
-                } else {
-                    console.log('Already had user ' + user.username + ', no need to seed');
-                }
-            });
+        UserDbModel.find({ username: user.username, role: user.role}, function(err, userResult) {
+            if (err || !userResult || userResult.length === 0) {
+                console.log('Seeding database with user ' + user.username + ' and role ' + user.role);
+                _addUser(null, null, user);
+            } else {
+                console.log('Already had user ' + user.username + ', no need to seed');
+            }
         });
     }
 
@@ -85,8 +93,17 @@ var UserRepo = (function() {
         var id = user.id;
         delete user.id;
 
-        _doUpdateUser(id, user, onSuccess, onError);
 
+
+        if (user.password) {
+            user.hashPassword(function() {
+                _doUpdateUser(id, user, onSuccess, onError);
+            }, function() {
+                onError('Failed to hash password');
+            });
+        } else {
+            _doUpdateUser(id, user, onSuccess, onError);
+        }
     }
 
     function _getUserById(onSuccess, onError, userId) {

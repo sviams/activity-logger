@@ -11,6 +11,9 @@ var path = require('path');
 var mongoose = require('mongoose');
 var UserRepo = require('./model/userRepo');
 var User = require('./model/user');
+var Activity = require('./model/activity');
+var TimeReg = require('./model/timereg');
+var TimeRegRepo = require('./model/timeRegRepo');
 var LocalStrategy = require('passport-local').Strategy;
 
 var app = express();
@@ -128,13 +131,13 @@ function restrictedToRole(role) {
 }
 
 // Reconstitute user object if possible
-function parseUser(req, res, next) {
-    User.Parse(req.body, next);
-}
+function parseUser(req, res, next) { User.Parse(req.body, next); }
+function parseTimeReg(req, res, next) { TimeReg.Parse(req.body, next); }
+function parseActivity(req, res, next) { Activity.Parse(req.body, next); }
 
-function execUserRequest(userFunction) {
+function execJsonRequest(jsonFunction) {
     return function (req, res) {
-        userFunction(function(jsonData) {
+        jsonFunction(function(jsonData) {
             res.json(200, jsonData);
         }, function(error) {
             res.send(500, error);
@@ -142,10 +145,31 @@ function execUserRequest(userFunction) {
     }
 }
 
-app.post('/users/:userId', authRequired, restrictedToRole(User.Roles.Admin), parseUser, execUserRequest(UserRepo.update));
-app.post('/users',         authRequired, restrictedToRole(User.Roles.Admin), parseUser, execUserRequest(UserRepo.add));
-app.get('/users/:userId',  authRequired, restrictedToRole(User.Roles.Admin), parseUser, execUserRequest(UserRepo.getById));
-app.get('/users',          authRequired, restrictedToRole(User.Roles.Admin), execUserRequest(UserRepo.list));
+
+function execActivityGet() {
+    return function (req, res) {
+        res.json(200, new Activity("TestActivity", "TestProject", "TestCustomer"))
+    }
+}
+
+function execActivityList() {
+    return function (req, res) {
+        res.json(200, [new Activity("TestActivity", "TestProject", "TestCustomer")])
+    }
+}
+
+app.post('/users/:userId', authRequired, restrictedToRole(User.Roles.Admin), parseUser, execJsonRequest(UserRepo.update));
+app.post('/users',         authRequired, restrictedToRole(User.Roles.Admin), parseUser, execJsonRequest(UserRepo.add));
+app.get('/users/:userId',  authRequired, restrictedToRole(User.Roles.Admin), parseUser, execJsonRequest(UserRepo.getById));
+app.get('/users',          authRequired, restrictedToRole(User.Roles.Admin), execJsonRequest(UserRepo.list));
+
+app.get('/activity/:activityId',    authRequired, restrictedToRole(User.Roles.Consultant), execActivityGet());
+app.get('/activity',                authRequired, restrictedToRole(User.Roles.Consultant), execActivityList());
+
+app.post('/timereg/:regId',  authRequired, restrictedToRole(User.Roles.Consultant), parseTimeReg, execJsonRequest(TimeRegRepo.update));
+app.post('/timereg',         authRequired, restrictedToRole(User.Roles.Consultant), parseTimeReg, execJsonRequest(TimeRegRepo.add));
+app.get('/timereg/:regId',   authRequired, restrictedToRole(User.Roles.Consultant), parseTimeReg, execJsonRequest(TimeRegRepo.getById));
+app.get('/timereg',          authRequired, restrictedToRole(User.Roles.Consultant), execJsonRequest(TimeRegRepo.list));
 
 
 http.createServer(app).listen(app.get('port'), function(){

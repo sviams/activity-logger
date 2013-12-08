@@ -33,6 +33,7 @@ module.exports.Roles = {
     Consultant: 2
 };
 
+
 module.exports.hashPassword = function(user, onSuccess, onFailure) {
     if (!user.password) {
         return onSuccess();
