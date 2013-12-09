@@ -26,13 +26,18 @@ module.exports.Status = {
 
 
 module.exports.Parse = function(data, callback) {
-    if (data === undefined || data === null) return null;
+    if (data === undefined || data === null) {
+        return null;
+    }
 
-    if (data.activity === undefined || data.activity === null) return null;
+    if (data.activity === undefined || data.activity === null) {
+        return null;
+    }
 
-    if (data.prototype !== TimeReg)
+    if (data.prototype !== TimeReg) {
         data.prototype = TimeReg;
+    }
 
-    return data;
-}
+    return callback();
+};
 

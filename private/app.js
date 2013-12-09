@@ -48,6 +48,8 @@ db.once('open', function callback() {
 // set up passport
 passport.use(new LocalStrategy(function(username, password, done) {
     UserRepo.find(function(user) {
+        console.log("Found user: ");
+        console.log(user);
         User.comparePassword(user, password, function(err, isMatch) {
             if (err) {
                 return done(err);
@@ -90,23 +92,13 @@ if ('development' === app.get('env')) {
 
 
 // Seed the database with default data
+
 UserRepo.deleteAll(function() {
     UserRepo.seedUser(new User(undefined, 'admin', 'changeme', 'System', 'Admin', 'admin@invalid', User.Roles.Admin));
     UserRepo.seedUser(new User(undefined, 'jimmy', 'changeme', 'Jimmy', 'Nilsson', 'jimmy@factor10.com', User.Roles.Manager));
     UserRepo.seedUser(new User(undefined, 'anders', 'changeme', 'Anders', 'Jändel', 'anders@factor10.com', User.Roles.Consultant));
 });
 
-
-app.get('/login', routes.login);
-app.get('/', authRequired, restrictedToRole(User.Roles.Consultant), routes.index);
-//app.get('/users', authRequired, restrictedToRole(User.Roles.Manager), Users.list);
-app.get('/admin', authRequired, restrictedToRole(User.Roles.Admin),routes.admin);
-app.post('/login', authFunction);
-app.get('/logout', function (req, res){
-    req.session.destroy(function (err) {
-        res.redirect('/login');
-    });
-});
 
 // Connect function for ensuring authorization before access
 function authRequired(req, res, next) {
@@ -130,6 +122,19 @@ function restrictedToRole(role) {
     };
 }
 
+app.get('/login', routes.login);
+app.get('/', authRequired, restrictedToRole(User.Roles.Consultant), routes.index);
+//app.get('/users', authRequired, restrictedToRole(User.Roles.Manager), Users.list);
+app.get('/admin', authRequired, restrictedToRole(User.Roles.Admin),routes.admin);
+app.post('/login', authFunction);
+app.get('/logout', function (req, res){
+    req.session.destroy(function (err) {
+        res.redirect('/login');
+    });
+});
+
+
+
 // Reconstitute user object if possible
 function parseUser(req, res, next) { User.Parse(req.body, next); }
 function parseTimeReg(req, res, next) { TimeReg.Parse(req.body, next); }
@@ -142,20 +147,20 @@ function execJsonRequest(jsonFunction) {
         }, function(error) {
             res.send(500, error);
         }, req.body);
-    }
+    };
 }
 
 
 function execActivityGet() {
     return function (req, res) {
-        res.json(200, new Activity("TestActivity", "TestProject", "TestCustomer"))
-    }
+        res.json(200, new Activity("TestActivity", "TestProject", "TestCustomer"));
+    };
 }
 
 function execActivityList() {
     return function (req, res) {
-        res.json(200, [new Activity("TestActivity", "TestProject", "TestCustomer")])
-    }
+        res.json(200, [new Activity("TestActivity", "TestProject", "TestCustomer")]);
+    };
 }
 
 app.post('/users/:userId', authRequired, restrictedToRole(User.Roles.Admin), parseUser, execJsonRequest(UserRepo.update));

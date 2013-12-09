@@ -15,10 +15,6 @@ var User = (function() {
         this.role = role;
     }
 
-
-
-    // Bcrypt middleware setup
-
     User.prototype.hashPassword = function(onSuccess, onFailure) { User.hashPassword(this, onSuccess, onFailure); };
 
     return User;
@@ -79,16 +75,18 @@ module.exports.comparePassword = function(user, candidatePassword, callback) {
 };
 
 module.exports.Parse = function(data, callback) {
-    if (data === undefined || data === null) return null;
+    if (data === undefined || data === null) {return null;}
 
-    if (data.username === undefined || data.username === null) return null;
+    if (data.username === undefined || data.username === null) {return null;}
 
-    if (data.prototype !== User)
+    if (data.prototype !== User) {
         data.prototype = User;
+    }
 
-    if (callback !== undefined && callback !== null && data.password)
+    if (callback !== undefined && callback !== null && data.password) {
         User.hashPassword(data, callback);
-    else
-        return data;
-}
+    } else {
+        return callback();
+    }
+};
 

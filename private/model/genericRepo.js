@@ -5,22 +5,22 @@ var GenericRepo = (function() {
 
     var mongoose = require('mongoose');
 
-    function _list(model, fields, onSuccess, onError) {
-        model.find(null, fields, function(error, result) {
+    function _list(fields, dbModel, restoreFunc, onSuccess, onError) {
+        dbModel.find(null, fields, function(error, result) {
             if (error) {
                 onError(error);
             } else {
-                onSuccess(_restoreList(result));
+                onSuccess(_restoreList(result, restoreFunc));
             }
         });
     }
 
-    function _add(modelType, obj, onSuccess, onErrors) {
+    function _add(obj, DbModel, restoreFunc, onSuccess, onError) {
         if (!obj) {
             return onError('Invalid object!');
         }
 
-        var newModel = new modelType(obj);
+        var newModel = new DbModel(obj);
 
         newModel.save(function(err, rawData) {
             if (err) {
@@ -29,61 +29,71 @@ var GenericRepo = (function() {
                 }
             } else {
                 if (onSuccess) {
-                    return onSuccess(restoreFunction(rawData));
+                    return onSuccess(restoreFunc(rawData));
                 }
             }
         });
     }
 
-    function _update(onSuccess, onError, model, modelType, restoreFunction) {
-        if (!model) {
+    function _update(obj, dbModel, restoreFunc, onSuccess, onError) {
+        if (obj === undefined || obj === null) {
             return onError('Invalid model object');
         }
 
-        var id = model.id;
-        delete model.id;
+        var id = obj.id;
+        delete obj.id;
 
-        modelType.update({ _id: id}, model, { upsert: true }, function(err, numberAffected, rawData) {
+        dbModel.update({ _id: id}, obj, { upsert: true }, function(err, numberAffected, rawData) {
             if (err) {
                 onError(err);
             } else {
-                onSuccess(restoreFunction(rawData));
+                onSuccess(restoreFunc(rawData));
             }
         });
     }
 
-    function _getById(onSuccess, onError, id, modelType, restoreFunction) {
-        modelType.findById(id, function(err, doc) {
+    function _getById(id, dbModel, restoreFunc, onSuccess, onError) {
+        dbModel.findById(id, function(err, doc) {
             if (err || doc === null) {
                 onError(err);
             } else {
-                onSuccess(restoreFunction(doc));
+                onSuccess(restoreFunc(doc));
             }
         });
     }
 
-    function _find(onSuccess, onError, searchObj, modelType) {
-        modelType.findOne(searchObj, function(err, doc) {
+    function _find(searchObj, dbModel, restoreFunc, onSuccess, onError) {
+        dbModel.findOne(searchObj, function(err, doc) {
             if (err || doc === null) {
                 onError(err);
             } else {
-                onSuccess(this._restoreSingle(doc));
+                onSuccess(restoreFunc(doc));
             }
         });
     }
 
-    function _deleteAllEntries(callback, modelType) {
-        modelType.remove({}, callback);
+    function _deleteAllEntries(dbModel, callback) {
+        dbModel.remove({}, callback);
+    }
+
+    function _restoreList(listDoc, restoreFunc) {
+        var list = [];
+        var count = listDoc.length;
+        for (var i = 0; i < count; i++) {
+            list.push(restoreFunc(listDoc[i]));
+        }
+        return list;
     }
 
     return {
         deleteAll: _deleteAllEntries,
         list: _list,
-        xadd: _add,
+        add: _add,
         update: _update,
         getById: _getById,
         find: _find
     };
+
 
 })();
 
