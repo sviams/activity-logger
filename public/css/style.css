@@ -29,3 +29,11 @@ a:active {
 .flat-panel-button:hover {
     background-color: #8c8c8c;
 }
+
+.name {
+    width: 40%;
+}
+
+.weekday {
+    width: 50px;
+}

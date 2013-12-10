@@ -34,41 +34,32 @@ alControllers.controller('UserListCtrl', ['$scope', 'User', function($scope, Use
 
 }]);
 
-/*
-var userListCtrl = function($scope, User) {
-    $http.get('/users').success(function(data) {
-        console.log("Loaded users from backend");
-        $scope.users = data;
-        //$scope.currentUser = $scope.users[0];
-    }).error(function(err) {
-            console.log("Failed to load user list");
-        });
+alControllers.controller('TimeCtrl', ['$scope', 'TimeReg', function($scope, TimeReg) {
 
-    $scope.setCurrentUser = function(user) {
-        $scope.currentUser = user;
+    function deltaDate(date, delta) {
+        var ms = date.getTime();
+        return new Date(ms + (delta * 86400000));
     }
 
-     $scope.newUser = function() {
-         $scope.currentUser = {};
-         $scope.users.push($scope.currentUser);
-         $scope.isNewUser = true;
-     }
-
-    $scope.saveCurrentUser = function() {
-        console.log('Saving current user: ' + $scope.currentUser);
-        $http.post('/user',  $scope.currentUser).success(function(data) {
-            console.log('Successfully saved ' + data);
-        }).error(function(err) {
-                console.log('Failed to save current user');
+    function initWeek() {
+        weekdayLabels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+        monthLabels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        $scope.week = []
+        var today = new Date();
+        var currentWeekday = today.getDay() - 1;
+        console.log("Current weekday: " + currentWeekday);
+        for (var i = 0; i < 7; i++) {
+            var date = deltaDate(today, i-currentWeekday);
+            $scope.week.push({
+                label: weekdayLabels[i],
+                date: date.getDate() + " " + monthLabels[date.getMonth()],
+                total: 0
             });
+        }
     }
 
-    $scope.cancelCurrentUser = function() {
-        console.log('Cancel editing current user');
-        if ($scope.isNewUser) $scope.users.pop();
-        $scope.currentUser = null;
-    }
-}
+    initWeek();
 
-alControllers.controller('UserListCtrl', userListCtrl);
-*/
+
+
+}]);

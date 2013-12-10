@@ -122,16 +122,18 @@ function restrictedToRole(role) {
     };
 }
 
-app.get('/login', routes.login);
-app.get('/', authRequired, restrictedToRole(User.Roles.Consultant), routes.index);
-//app.get('/users', authRequired, restrictedToRole(User.Roles.Manager), Users.list);
-app.get('/admin', authRequired, restrictedToRole(User.Roles.Admin),routes.admin);
-app.post('/login', authFunction);
-app.get('/logout', function (req, res){
+function logoutFunction(req, res){
     req.session.destroy(function (err) {
         res.redirect('/login');
     });
-});
+}
+
+app.get('/login', routes.login);
+app.get('/', authRequired, restrictedToRole(User.Roles.Consultant), routes.index);
+app.get('/admin', authRequired, restrictedToRole(User.Roles.Admin),routes.admin);
+app.get('/time', authRequired, restrictedToRole(User.Roles.Consultant),routes.time);
+app.post('/login', authFunction);
+app.get('/logout', logoutFunction);
 
 
 

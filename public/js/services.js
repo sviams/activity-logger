@@ -10,3 +10,8 @@ activityLoggerServices.factory('User', ['$resource', function($resource) {
     });
 }]);
 
+activityLoggerServices.factory('TimeReg', ['$resource', function($resource) {
+    return $resource('/timereg/:regId', { regId: '@id' } , {
+        list: { method: 'GET', params:{}, isArray:true}
+    });
+}]);

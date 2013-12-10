@@ -23,3 +23,10 @@ exports.login = function(req, res){
         user: req.user
     });
 };
+
+exports.time = function(req, res){
+    res.render('time', {
+        title: 'Current week',
+        user: req.user
+    });
+};

@@ -1,0 +1,56 @@
+extends layout
+
+block content
+    div(class='container')
+        div(class='row')
+            a(href="/users")
+                div(class='col-md-1 col-md-offset-4 flat-panel-button')
+                    p(class='text-center') Week
+        br
+        div(class='row' ng-controller='TimeCtrl')
+            div(class='col-md-12')
+                table(class='table table-hover')
+                    thead
+                        td(class="name")
+                        td(class="weekday") {{week[0].label}} {{week[0].date}}
+                        td(class="weekday") {{week[1].label}} {{week[1].date}}
+                        td(class="weekday") {{week[2].label}} {{week[2].date}}
+                        td(class="weekday") {{week[3].label}} {{week[3].date}}
+                        td(class="weekday") {{week[4].label}} {{week[4].date}}
+                        td(class="weekday") {{week[5].label}} {{week[5].date}}
+                        td(class="weekday") {{week[6].label}} {{week[6].date}}
+                        td(class="weekday") &nbsp
+                        td(class="weekday") &nbsp
+                    tfoot
+                        td(class="name")
+                            button(class="btn-success") Add row
+                            button(class="btn-primary") Save
+                        td(class="weekday") {{week[0].total()}}
+                        td(class="weekday") {{week[1].total()}}
+                        td(class="weekday") {{week[2].total()}}
+                        td(class="weekday") {{week[3].total()}}
+                        td(class="weekday") {{week[4].total()}}
+                        td(class="weekday") {{week[5].total()}}
+                        td(class="weekday") {{week[6].total()}}
+                        td(class="weekday") &nbsp
+                        td(class="weekday") &nbsp
+                    tbody(ng-repeat='row in rows')
+                        tr
+                            td(class="name") {{row.name}} ({{row.project}})
+                            td(class="weekday")
+                                input(type="text" ng-model="row.monday")
+                            td(class="weekday")
+                                input(type="text" ng-model="row.tuesday")
+                            td(class="weekday")
+                                input(type="text" ng-model="row.wednesday")
+                            td(class="weekday")
+                                input(type="text" ng-model="row.thursday")
+                            td(class="weekday")
+                                input(type="text" ng-model="row.friday")
+                            td(class="weekday")
+                                input(type="text" ng-model="row.saturday")
+                            td(class="weekday")
+                                input(type="text" ng-model="row.sunday")
+                            td(class="weekday") {{row.total}}
+                            td(class="weekday")
+                                button(class="btn-danger" ng-click="onRemoveRow($index)")
