@@ -15,3 +15,9 @@ activityLoggerServices.factory('TimeReg', ['$resource', function($resource) {
         list: { method: 'GET', params:{}, isArray:true}
     });
 }]);
+
+activityLoggerServices.factory('Project', ['$resource', function($resource) {
+    return $resource('/project/:projectId', { regId: '@id' } , {
+        list: { method: 'GET', params:{}, isArray:true}
+    });
+}]);

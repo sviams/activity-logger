@@ -3,7 +3,7 @@ extends layout
 block content
     div(class='container')
         div(class='row')
-            a(href="/users")
+            a(href="/time")
                 div(class='col-md-1 col-md-offset-4 flat-panel-button')
                     p(class='text-center') Week
         br
@@ -23,8 +23,10 @@ block content
                         td(class="weekday") &nbsp
                     tfoot
                         td(class="name")
-                            button(class="btn-success") Add row
-                            button(class="btn-primary") Save
+                            span
+                                button(class="btn btn-success" ng-click="onAddRow()") Add row
+                            span
+                                button(class="btn btn-primary" ng-click="onSave()") Save
                         td(class="weekday") {{week[0].total()}}
                         td(class="weekday") {{week[1].total()}}
                         td(class="weekday") {{week[2].total()}}
@@ -38,19 +40,20 @@ block content
                         tr
                             td(class="name") {{row.name}} ({{row.project}})
                             td(class="weekday")
-                                input(type="text" ng-model="row.monday")
+                                input(type="text" class="weekday form-control" ng-model="row.monday")
                             td(class="weekday")
-                                input(type="text" ng-model="row.tuesday")
+                                input(type="text" class="weekday form-control" ng-model="row.tuesday")
                             td(class="weekday")
-                                input(type="text" ng-model="row.wednesday")
+                                input(type="text" class="weekday form-control" ng-model="row.wednesday")
                             td(class="weekday")
-                                input(type="text" ng-model="row.thursday")
+                                input(type="text" class="weekday form-control" ng-model="row.thursday")
                             td(class="weekday")
-                                input(type="text" ng-model="row.friday")
+                                input(type="text" class="weekday form-control" ng-model="row.friday")
                             td(class="weekday")
-                                input(type="text" ng-model="row.saturday")
+                                input(type="text" class="weekday form-control" ng-model="row.saturday")
                             td(class="weekday")
-                                input(type="text" ng-model="row.sunday")
+                                input(type="text" class="weekday form-control" ng-model="row.sunday")
                             td(class="weekday") {{row.total}}
                             td(class="weekday")
-                                button(class="btn-danger" ng-click="onRemoveRow($index)")
+                                button(class="btn btn-danger" ng-click="onRemoveRow($index)")
+                                    span(class="glyphicon glyphicon-remove")

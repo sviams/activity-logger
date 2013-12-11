@@ -30,3 +30,7 @@ exports.time = function(req, res){
         user: req.user
     });
 };
+
+exports.project_picker = function(req, res){
+    res.render('project_picker');
+};

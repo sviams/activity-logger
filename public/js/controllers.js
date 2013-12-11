@@ -34,7 +34,7 @@ alControllers.controller('UserListCtrl', ['$scope', 'User', function($scope, Use
 
 }]);
 
-alControllers.controller('TimeCtrl', ['$scope', 'TimeReg', function($scope, TimeReg) {
+alControllers.controller('TimeCtrl', ['$scope', '$modal', 'TimeReg', 'Project', function($scope, $modal, TimeReg, Project) {
 
     function deltaDate(date, delta) {
         var ms = date.getTime();
@@ -60,6 +60,52 @@ alControllers.controller('TimeCtrl', ['$scope', 'TimeReg', function($scope, Time
 
     initWeek();
 
+    $scope.rows = [];
+    $scope.regs = TimeReg.list();
+    $scope.projects = Project.list();
 
+    $scope.rows.push({ name: "ActivityName", project: "TestProj"});
+
+    $scope.onAddRow = function() {
+
+        var modalInstance = $modal.open({
+            templateUrl: '/modal/projectpicker',
+            controller: 'ProjectPickerCtrl',
+            resolve: {
+                projects: function() {
+                    return $scope.projects;
+                }
+            }
+        });
+
+        modalInstance.result.then(function(selectedItem) {
+            console.log("Got result from modal");
+            console.log(selectedItem);
+            $scope.rows.push(selectedItem);
+        }, function() {
+            console.log("Canceled");
+        });
+
+    }
+
+
+
+
+}]);
+
+alControllers.controller('ProjectPickerCtrl', ['$scope', '$modalInstance', 'projects', function($scope, $modalInstance, projects) {
+    console.log(projects);
+
+    $scope.projects = projects;
+
+
+
+    $scope.ok = function () {
+        $modalInstance.close($scope.selected.item);
+    };
+
+    $scope.cancel = function () {
+        $modalInstance.dismiss('cancel');
+    };
 
 }]);

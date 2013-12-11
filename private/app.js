@@ -11,6 +11,7 @@ var path = require('path');
 var mongoose = require('mongoose');
 var UserRepo = require('./model/userRepo');
 var User = require('./model/user');
+var Project = require('./model/project');
 var Activity = require('./model/activity');
 var TimeReg = require('./model/timereg');
 var TimeRegRepo = require('./model/timeRegRepo');
@@ -132,6 +133,7 @@ app.get('/login', routes.login);
 app.get('/', authRequired, restrictedToRole(User.Roles.Consultant), routes.index);
 app.get('/admin', authRequired, restrictedToRole(User.Roles.Admin),routes.admin);
 app.get('/time', authRequired, restrictedToRole(User.Roles.Consultant),routes.time);
+app.get('/modal/projectpicker', authRequired, restrictedToRole(User.Roles.Consultant),routes.project_picker);
 app.post('/login', authFunction);
 app.get('/logout', logoutFunction);
 
@@ -152,16 +154,31 @@ function execJsonRequest(jsonFunction) {
     };
 }
 
+var activities1 = []
+activities1.push(new Activity("Analysis", "Spend some time thinking before doing", false));
+activities1.push(new Activity("Design", "Translate theory into abstract design", true));
+activities1.push(new Activity("Development", "Turn design into reality, and redesign accordingly", true));
+activities1.push(new Activity("Test", "Find out how much time you've lost", true));
 
-function execActivityGet() {
+var project1 = new Project("Waterfall", "Dinosaur Inc", activities1);
+
+var activities2 = []
+activities2.push(new Activity("Prototype", "More hockey, less talking", true));
+activities2.push(new Activity("Refactor", "Turn hockey into ice skating", true));
+activities2.push(new Activity("Test", "Lots of auto testing here", true));
+
+
+var project2 = new Project("Agile", "Hipster LLC", activities2);
+
+function execProjectGet() {
     return function (req, res) {
-        res.json(200, new Activity("TestActivity", "TestProject", "TestCustomer"));
+        res.json(200, project1);
     };
 }
 
-function execActivityList() {
+function execProjectList() {
     return function (req, res) {
-        res.json(200, [new Activity("TestActivity", "TestProject", "TestCustomer")]);
+        res.json(200, [project1, project2]);
     };
 }
 
@@ -170,8 +187,8 @@ app.post('/users',         authRequired, restrictedToRole(User.Roles.Admin), par
 app.get('/users/:userId',  authRequired, restrictedToRole(User.Roles.Admin), parseUser, execJsonRequest(UserRepo.getById));
 app.get('/users',          authRequired, restrictedToRole(User.Roles.Admin), execJsonRequest(UserRepo.list));
 
-app.get('/activity/:activityId',    authRequired, restrictedToRole(User.Roles.Consultant), execActivityGet());
-app.get('/activity',                authRequired, restrictedToRole(User.Roles.Consultant), execActivityList());
+app.get('/project/:projectId',      authRequired, restrictedToRole(User.Roles.Consultant), execProjectGet());
+app.get('/project',                 authRequired, restrictedToRole(User.Roles.Consultant), execProjectList());
 
 app.post('/timereg/:regId',  authRequired, restrictedToRole(User.Roles.Consultant), parseTimeReg, execJsonRequest(TimeRegRepo.update));
 app.post('/timereg',         authRequired, restrictedToRole(User.Roles.Consultant), parseTimeReg, execJsonRequest(TimeRegRepo.add));
