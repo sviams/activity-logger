@@ -1,10 +1,11 @@
 extends layout
 
 block content
-    div(class='container' style='background-color:blue')
+    div(class='container')
         div(class='row')
-            div(class='col-md-3' style='background-color:#ffdcdc')
+            div(class='col-md-3')
                 h1= title
                 p Welcome to #{title}
                 p This is #{whatever}
                 a(href='/admin') Admin
+                a(href='/time') Time

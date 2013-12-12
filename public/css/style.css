@@ -37,3 +37,15 @@ a:active {
 .weekday {
     width: 50px;
 }
+
+.today {
+    background-color: #a0a0a0;
+}
+
+.table-head {
+    background-color: #dcdcdc;
+}
+
+.table-foot {
+    background-color: #dcdcdc;
+}

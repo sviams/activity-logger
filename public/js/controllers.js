@@ -46,13 +46,14 @@ alControllers.controller('TimeCtrl', ['$scope', '$modal', 'TimeReg', 'Project', 
         monthLabels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
         $scope.week = []
         var today = new Date();
-        var currentWeekday = today.getDay() - 1;
-        console.log("Current weekday: " + currentWeekday);
+        currentWeekdayIndex = today.getDay() - 1;
+        console.log("Current weekday: " + currentWeekdayIndex);
         for (var i = 0; i < 7; i++) {
-            var date = deltaDate(today, i-currentWeekday);
+            var date = deltaDate(today, i-currentWeekdayIndex);
             $scope.week.push({
                 label: weekdayLabels[i],
                 date: date.getDate() + " " + monthLabels[date.getMonth()],
+                current: i === currentWeekdayIndex,
                 total: 0
             });
         }
@@ -63,8 +64,6 @@ alControllers.controller('TimeCtrl', ['$scope', '$modal', 'TimeReg', 'Project', 
     $scope.rows = [];
     $scope.regs = TimeReg.list();
     $scope.projects = Project.list();
-
-    $scope.rows.push({ name: "ActivityName", project: "TestProj"});
 
     $scope.onAddRow = function() {
 
@@ -78,18 +77,48 @@ alControllers.controller('TimeCtrl', ['$scope', '$modal', 'TimeReg', 'Project', 
             }
         });
 
-        modalInstance.result.then(function(selectedItem) {
-            console.log("Got result from modal");
-            console.log(selectedItem);
-            $scope.rows.push(selectedItem);
-        }, function() {
-            console.log("Canceled");
+        modalInstance.result.then(function(result) {
+            $scope.rows.push({ activity: result.activity, project: result.project, time: new Array(7)});
         });
 
     }
 
+    $scope.range = function(num) {
+        return new Array(num);
+    }
 
+    $scope.rowTotal = function(row) {
+        var result = 0;
+        for (i in row.time) {
+            var value = parseFloat(row.time[i]);
+            if (!isNaN(value))
+                result += value;
+        }
+        row.total = result;
+        return result;
+    }
 
+    $scope.colTotal = function(colIndex) {
+        var result = 0;
+        for (i in $scope.rows) {
+            var val = parseFloat($scope.rows[i].time[colIndex]);
+            if (!isNaN(val)) {
+                result += val;
+            }
+        }
+        return result;
+    }
+
+    $scope.total = function() {
+        var result = 0;
+        for (i in $scope.rows) {
+            var val = parseFloat($scope.rows[i].total);
+            if (!isNaN(val)) {
+                result += val;
+            }
+        }
+        return result;
+    }
 
 }]);
 
@@ -98,10 +127,10 @@ alControllers.controller('ProjectPickerCtrl', ['$scope', '$modalInstance', 'proj
 
     $scope.projects = projects;
 
-
+    $scope.project = projects[0];
 
     $scope.ok = function () {
-        $modalInstance.close($scope.selected.item);
+        $modalInstance.close({ project: this.project, activity: this.activity});
     };
 
     $scope.cancel = function () {

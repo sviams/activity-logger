@@ -1,7 +1,14 @@
 div(class="modal-header")
     h3 Select Project
 div(class="modal-body")
-    p yada yada
+    form(class="form-horizontal")
+        div(class="form-group")
+            label(class="control-label" for="projectSelect") Project
+            select(class="form-control" name='projectSelect' ng-model='project' ng-options='project.name for project in projects' required)
+        div(class="form-group")
+            label(class="control-label" for="activitySelect") Activity
+            select(class="form-control" name="activitySelect" ng-model='activity' ng-options='act.name for act in project.activities' required)
+                option(value="") -- Select activity --
 div(class="modal-footer")
-    button(class="btn btn-primary" ng-click="ok()") OK
+    button(class="btn btn-primary" ng-click="ok()" ng-disabled="activity == ''") OK
     button(class="btn btn-warning" ng-click="cancel()") Cancel
