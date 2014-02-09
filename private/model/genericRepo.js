@@ -2,15 +2,28 @@
 
 var GenericRepo = (function() {
 
-
+    var Utils = require('../utils/utils');
     var mongoose = require('mongoose');
 
-    function _list(fields, dbModel, restoreFunc, onSuccess, onError) {
-        dbModel.find(null, fields, function(error, result) {
+    function _getDbModel(name, schema) {
+        try {
+            var existingModel = mongoose.model(name);
+            if (existingModel) {
+                return existingModel;
+            }
+        } catch (e) {
+            if (e.name === 'MissingSchemaError') {
+                return mongoose.model(name, schema);
+            }
+        }
+    }
+
+    function _list(searchObj, fields, dbModel, restoreFunc, onSuccess, onError) {
+        return dbModel.find(searchObj, fields, function(error, results) {
             if (error) {
                 onError(error);
             } else {
-                onSuccess(_restoreList(result, restoreFunc));
+                onSuccess(_restoreList(results, restoreFunc));
             }
         });
     }
@@ -20,6 +33,19 @@ var GenericRepo = (function() {
             return onError('Invalid object!');
         }
 
+        DbModel.create(obj, function(err, result) {
+            if (err) {
+                onError(err);
+            } else {
+                if (Utils.isArray(result)) {
+                    onSuccess(_restoreList(result, restoreFunc));
+                } else {
+                    onSuccess(restoreFunc(result));
+                }
+            }
+        });
+
+        /*
         var newModel = new DbModel(obj);
 
         newModel.save(function(err, rawData) {
@@ -33,6 +59,7 @@ var GenericRepo = (function() {
                 }
             }
         });
+        */
     }
 
     function _update(obj, dbModel, restoreFunc, onSuccess, onError) {
@@ -91,7 +118,8 @@ var GenericRepo = (function() {
         add: _add,
         update: _update,
         getById: _getById,
-        find: _find
+        find: _find,
+        getDbModel: _getDbModel
     };
 
 

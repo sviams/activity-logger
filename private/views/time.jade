@@ -12,7 +12,7 @@ block content
                 table(class='table table-hover')
                     thead(class="table-head")
                         td(class="name")
-                        td(class="weekday" ng-repeat="i in range(7) track by $index" ng-class="{today: week[$index].current}") {{week[$index].label}} {{week[$index].date}}
+                        td(class="weekday" ng-repeat="day in week" ng-class="{today: day.current}") {{day.label}} {{day.dateLabel}}
                         td(class="weekday") Total
                         td(class="weekday") &nbsp
                     tfoot(class="table-foot")
@@ -21,18 +21,19 @@ block content
                                 button(class="btn btn-success" ng-click="onAddRow()") Add row
                             span
                                 button(class="btn btn-primary" ng-click="onSave()") Save
-                        td(class="weekday" ng-repeat="i in range(7) track by $index") {{colTotal($index)}}
-                        td(class="weekday") {{total()}}
+                        td(class="weekday" ng-repeat="day in week") {{dayTotal(day)}}
+                        td(class="weekday")
+                            strong {{total()}}
                         td(class="weekday") &nbsp
-                    tbody(ng-repeat='row in rows')
+                    tbody(ng-repeat='(id,activity) in period.activities')
                         tr
                             td(class="name")
                                 span
-                                    strong {{row.activity.name}}
-                                    span  ({{row.project.name}})
-                            td(class="weekday" ng-repeat="i in range(7) track by $index")
-                                input(type="text" class="weekday form-control" ng-model="row.time[$index]")
-                            td(class="weekday") {{rowTotal(row)}}
+                                    strong {{activityName(id)}}
+                                    span  ({{projectNameByActivity(id)}})
+                            td(class="weekday" ng-repeat="day in week")
+                                input(type="text" class="weekday form-control" ng-model="activity[day.date]")
+                            td(class="weekday") {{activityTotal(activity)}}
                             td(class="weekday")
                                 button(class="btn btn-danger" ng-click="onRemoveRow($index)")
                                     span(class="glyphicon glyphicon-remove")

@@ -40,7 +40,7 @@ var UserRepo = (function() {
                 console.log('Hashing password for ' + user.username);
                 user.hashPassword(function(successResult) {
                     console.log('Seeding database with user ' + user.username + ' and role ' + user.role);
-                    UserRepo.add(null, null, user);
+                    UserRepo.add(function() {}, function() {}, user);
                 });
 
             } else {
@@ -50,7 +50,7 @@ var UserRepo = (function() {
     }
 
     function _listUsers(onSuccess, onError) {
-        return GenericRepo.list('username email firstname lastname role _id', UserDbModel, _restoreUser, onSuccess, onError);
+        return GenericRepo.list(null, 'username email firstname lastname role _id', UserDbModel, _restoreUser, onSuccess, onError);
     }
 
     function _addUser(onSuccess, onError, user) {
@@ -80,7 +80,7 @@ var UserRepo = (function() {
     return {
         add: _addUser,
         deleteAll: _deleteAllEntries,
-        list: _listUsers,
+        all: _listUsers,
         update: _updateUser,
         getById: _getUserById,
         find: _findUser,

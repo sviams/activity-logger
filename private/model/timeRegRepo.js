@@ -13,16 +13,19 @@ var TimeRegRepo = (function() {
     var _timeRegSchema = new mongoose.Schema({
         activity: { type: String, required: true},
         user: { type: String, required: true},
-        date: { type: String, required: true},
+        date: { type: Date, required: true},
         duration: { type: String, required: true},
-        description: { type: String, required: true},
+        description: { type: String}
     });
 
+    var TimeRegDbModel =  GenericRepo.getDbModel('TimeReg', _timeRegSchema);
 
-    var TimeRegDbModel =  mongoose.model('TimeReg', _timeRegSchema);
+    function _listAll(onSuccess, onError) {
+        return GenericRepo.list(null, 'activity user date duration description _id', TimeRegDbModel, _restoreSingle, onSuccess, onError);
+    }
 
-    function _list(onSuccess, onError) {
-        return GenericRepo.list('activity user date duration description _id', TimeRegDbModel, _restoreSingle, onSuccess, onError);
+    function _findMatching(onSuccess, onError, query) {
+        return GenericRepo.list(query, 'activity user date duration description _id', TimeRegDbModel, _restoreSingle, onSuccess, onError);
     }
 
     function _add(onSuccess, onError, timeReg) {
@@ -48,10 +51,11 @@ var TimeRegRepo = (function() {
     return {
         add: _add,
         deleteAll: _deleteAllEntries,
-        list: _list,
+        all: _listAll,
         update: _update,
         getById: _getById,
-        find: _find
+        find: _find,
+        match: _findMatching
     };
 })();
 

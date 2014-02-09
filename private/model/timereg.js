@@ -23,21 +23,3 @@ module.exports.Status = {
     Approved: 2,
     Invoiced: 3
 };
-
-
-module.exports.Parse = function(data, callback) {
-    if (data === undefined || data === null) {
-        return null;
-    }
-
-    if (data.activity === undefined || data.activity === null) {
-        return null;
-    }
-
-    if (data.prototype !== TimeReg) {
-        data.prototype = TimeReg;
-    }
-
-    return callback();
-};
-

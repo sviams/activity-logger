@@ -34,25 +34,30 @@ alControllers.controller('UserListCtrl', ['$scope', 'User', function($scope, Use
 
 }]);
 
-alControllers.controller('TimeCtrl', ['$scope', '$modal', 'TimeReg', 'Project', function($scope, $modal, TimeReg, Project) {
+alControllers.controller('TimeCtrl', ['$scope', '$modal', 'TimeReg', 'Project', 'Period', function($scope, $modal, TimeReg, Project, Period) {
 
     function deltaDate(date, delta) {
         var ms = date.getTime();
         return new Date(ms + (delta * 86400000));
     }
 
+
+
     function initWeek() {
         weekdayLabels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
         monthLabels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
         $scope.week = []
         var today = new Date();
-        currentWeekdayIndex = today.getDay() - 1;
-        console.log("Current weekday: " + currentWeekdayIndex);
+        var currentWeekdayIndex = today.getDay() -1;
+        if (currentWeekdayIndex === -1) {
+            currentWeekdayIndex = 6; // Sundays
+        }
         for (var i = 0; i < 7; i++) {
             var date = deltaDate(today, i-currentWeekdayIndex);
             $scope.week.push({
                 label: weekdayLabels[i],
-                date: date.getDate() + " " + monthLabels[date.getMonth()],
+                dateLabel: date.getDate() + " " + monthLabels[date.getMonth()],
+                date: date.toISOString().substring(0, 10),
                 current: i === currentWeekdayIndex,
                 total: 0
             });
@@ -61,8 +66,16 @@ alControllers.controller('TimeCtrl', ['$scope', '$modal', 'TimeReg', 'Project', 
 
     initWeek();
 
-    $scope.rows = [];
-    $scope.regs = TimeReg.list();
+    $scope.period = Period.get({ startDate: $scope.week[0].date, endDate: $scope.week[$scope.week.length-1].date})
+
+    /*
+    $scope.period = {
+        rows: [],
+        startDate: $scope.week[0].date,
+        endDate: $scope.week[$scope.week.length-1].date
+    };
+    */
+
     $scope.projects = Project.list();
 
     $scope.onAddRow = function() {
@@ -78,30 +91,65 @@ alControllers.controller('TimeCtrl', ['$scope', '$modal', 'TimeReg', 'Project', 
         });
 
         modalInstance.result.then(function(result) {
-            $scope.rows.push({ activity: result.activity, project: result.project, time: new Array(7)});
+            $scope.period.activities[result.activity] = {}
+            //$scope.period.rows.push({ activity: result.activity, project: result.project, time: new Array(7)});
         });
 
+    }
+
+    $scope.onSave = function() {
+        Period.save($scope.period);
     }
 
     $scope.range = function(num) {
         return new Array(num);
     }
 
-    $scope.rowTotal = function(row) {
+    $scope.weekDates = function() {
+
+    }
+
+    $scope.activityName = function(activity) {
+        for (var projIndex in $scope.projects) {
+            var project = $scope.projects[projIndex];
+            if (project.activities === undefined) {
+                return;
+            }
+
+            if (project.activities[activity] != undefined) {
+                return project.activities[activity].name;
+            }
+        }
+        return "Unknown activity";
+    }
+
+    $scope.projectNameByActivity = function(activity) {
+        for (var projIndex in $scope.projects) {
+            var project = $scope.projects[projIndex];
+            if (project.activities === undefined) {
+                return;
+            }
+            if (project.activities[activity] != undefined) {
+                return project.name;
+            }
+        }
+        return "Unknown activity";
+    }
+
+    $scope.activityTotal = function(activity) {
         var result = 0;
-        for (i in row.time) {
-            var value = parseFloat(row.time[i]);
+        for (i in activity) {
+            var value = parseFloat(activity[i]);
             if (!isNaN(value))
                 result += value;
         }
-        row.total = result;
         return result;
     }
 
-    $scope.colTotal = function(colIndex) {
+    $scope.dayTotal = function(day) {
         var result = 0;
-        for (i in $scope.rows) {
-            var val = parseFloat($scope.rows[i].time[colIndex]);
+        for (i in $scope.period.activities) {
+            var val = parseFloat($scope.period.activities[i][day.date]);
             if (!isNaN(val)) {
                 result += val;
             }
@@ -111,11 +159,8 @@ alControllers.controller('TimeCtrl', ['$scope', '$modal', 'TimeReg', 'Project', 
 
     $scope.total = function() {
         var result = 0;
-        for (i in $scope.rows) {
-            var val = parseFloat($scope.rows[i].total);
-            if (!isNaN(val)) {
-                result += val;
-            }
+        for (i in $scope.period.activities) {
+            result += $scope.activityTotal($scope.period.activities[i]);
         }
         return result;
     }

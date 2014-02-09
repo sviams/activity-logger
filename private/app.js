@@ -15,6 +15,7 @@ var Project = require('./model/project');
 var Activity = require('./model/activity');
 var TimeReg = require('./model/timereg');
 var TimeRegRepo = require('./model/timeRegRepo');
+var Period = require('./model/period');
 var LocalStrategy = require('passport-local').Strategy;
 
 var app = express();
@@ -43,8 +44,6 @@ db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function callback() {
     console.log('Connected to DB');
 });
-
-
 
 // set up passport
 passport.use(new LocalStrategy(function(username, password, done) {
@@ -140,7 +139,7 @@ app.get('/logout', logoutFunction);
 
 
 // Reconstitute user object if possible
-function parseUser(req, res, next) { User.Parse(req.body, next); }
+
 function parseTimeReg(req, res, next) { TimeReg.Parse(req.body, next); }
 function parseActivity(req, res, next) { Activity.Parse(req.body, next); }
 
@@ -154,21 +153,30 @@ function execJsonRequest(jsonFunction) {
     };
 }
 
-var activities1 = []
-activities1.push(new Activity("Analysis", "Spend some time thinking before doing", false));
-activities1.push(new Activity("Design", "Translate theory into abstract design", true));
-activities1.push(new Activity("Development", "Turn design into reality, and redesign accordingly", true));
-activities1.push(new Activity("Test", "Find out how much time you've lost", true));
+function execJsonQuery(jsonFunction) {
+    return function (req, res) {
+        jsonFunction(function(jsonData) {
+            res.json(200, jsonData);
+        }, function(error) {
+            res.send(500, error);
+        }, req);
+    };
+}
 
-var project1 = new Project("Waterfall", "Dinosaur Inc", activities1);
+var project1 = new Project("Waterfall", "Dinosaur Inc", {}, 123123);
+project1.activities[11111] = new Activity("Analysis", "Spend some time thinking before doing", false, 11111);
+project1.activities[22222] = new Activity("Design", "Translate theory into abstract design", true, 22222);
+project1.activities[33333] = new Activity("Development", "Turn design into reality, and redesign accordingly", true, 33333);
+project1.activities[44444] = new Activity("Test", "Find out how much time you've lost", true, 44444);
 
-var activities2 = []
-activities2.push(new Activity("Prototype", "More hockey, less talking", true));
-activities2.push(new Activity("Refactor", "Turn hockey into ice skating", true));
-activities2.push(new Activity("Test", "Lots of auto testing here", true));
+
+var project2 = new Project("Agile", "Hipster LLC", {}, 234234);
+project2.activities[55555] = new Activity("Prototype", "More hockey, less talking", true, 55555);
+project2.activities[66666] = new Activity("Refactor", "Turn hockey into ice skating", true, 66666);
+project2.activities[77777] = new Activity("Test", "Lots of auto testing here", true, 77777);
 
 
-var project2 = new Project("Agile", "Hipster LLC", activities2);
+
 
 function execProjectGet() {
     return function (req, res) {
@@ -182,19 +190,35 @@ function execProjectList() {
     };
 }
 
+function parse(proto) {
+    return function(data, callback) {
+        if (data === undefined || data === null) { return null; }
+
+        if (data.activity === undefined || data.activity === null) { return null; }
+
+        if (data.prototype !== proto) { data.prototype = proto; }
+
+        return callback();
+    }
+};
+
+function parseUser(req, res, next) { User.Parse(req.body, next); }
 app.post('/users/:userId', authRequired, restrictedToRole(User.Roles.Admin), parseUser, execJsonRequest(UserRepo.update));
 app.post('/users',         authRequired, restrictedToRole(User.Roles.Admin), parseUser, execJsonRequest(UserRepo.add));
 app.get('/users/:userId',  authRequired, restrictedToRole(User.Roles.Admin), parseUser, execJsonRequest(UserRepo.getById));
-app.get('/users',          authRequired, restrictedToRole(User.Roles.Admin), execJsonRequest(UserRepo.list));
+app.get('/users',          authRequired, restrictedToRole(User.Roles.Admin), execJsonRequest(UserRepo.all));
 
 app.get('/project/:projectId',      authRequired, restrictedToRole(User.Roles.Consultant), execProjectGet());
 app.get('/project',                 authRequired, restrictedToRole(User.Roles.Consultant), execProjectList());
 
-app.post('/timereg/:regId',  authRequired, restrictedToRole(User.Roles.Consultant), parseTimeReg, execJsonRequest(TimeRegRepo.update));
-app.post('/timereg',         authRequired, restrictedToRole(User.Roles.Consultant), parseTimeReg, execJsonRequest(TimeRegRepo.add));
-app.get('/timereg/:regId',   authRequired, restrictedToRole(User.Roles.Consultant), parseTimeReg, execJsonRequest(TimeRegRepo.getById));
-app.get('/timereg',          authRequired, restrictedToRole(User.Roles.Consultant), execJsonRequest(TimeRegRepo.list));
+app.post('/timereg/:regId',  authRequired, restrictedToRole(User.Roles.Consultant), parse(TimeReg), execJsonRequest(TimeRegRepo.update));
+app.post('/timereg',         authRequired, restrictedToRole(User.Roles.Consultant), parse(TimeReg), execJsonRequest(TimeRegRepo.add));
+app.get('/timereg/:regId',   authRequired, restrictedToRole(User.Roles.Consultant), parse(TimeReg), execJsonRequest(TimeRegRepo.getById));
+app.get('/timereg',          authRequired, restrictedToRole(User.Roles.Consultant), execJsonRequest(TimeRegRepo.all));
 
+//app.get('/period', authRequired, restrictedToRole(User.Roles.Consultant), execJsonQuery(Period.get));
+app.get('/period', execJsonQuery(Period.get));
+app.post('/period', execJsonRequest(Period.post));
 
 http.createServer(app).listen(app.get('port'), function(){
     console.log('Express server listening on port ' + app.get('port'));

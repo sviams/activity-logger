@@ -2,10 +2,11 @@
 
 var Project = (function() {
 
-    function Project(name, customer, activities) {
+    function Project(name, customer, activities, id) {
         this.name = name;
         this.customer = customer;
         this.activities = activities;
+        this.id = id;
     }
 
     return Project;

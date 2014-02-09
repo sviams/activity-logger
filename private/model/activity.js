@@ -2,10 +2,11 @@
 
 var Activity = (function() {
 
-    function Activity(name, description, isBillable) {
+    function Activity(name, description, isBillable, id) {
         this.name = name;
         this.description = description;
         this.isBillable = isBillable;
+        this.id = id;
     }
 
     return Activity;

@@ -96,7 +96,7 @@ describe('User model', function() {
 
     it('should fail to list any users when empty', function(done) {
 
-        UserRepo.list(function(successResult) {
+        UserRepo.all(function(successResult) {
             expect(successResult.length).toEqual(0);
             done();
         }, function(error) {

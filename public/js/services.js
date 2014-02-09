@@ -21,3 +21,7 @@ activityLoggerServices.factory('Project', ['$resource', function($resource) {
         list: { method: 'GET', params:{}, isArray:true}
     });
 }]);
+
+activityLoggerServices.factory('Period', ['$resource', function($resource) {
+    return $resource('/period/', { startDate: '@startDate', endDate: '@endDate'});
+}]);
