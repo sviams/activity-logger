@@ -16,9 +16,12 @@
     "tests"
   ],
   "dependencies": {
-    "jquery": "~2.0.3"
-  },
-  "resolutions": {
-    "angular": "1.2.0-rc.3"
+    "jquery": "latest",
+    "angular": "latest",
+    "angular-bootstrap": "latest",
+    "angular-route": "latest",
+    "angular-scenario": "latest",
+    "angular-resource": "latest",
+    "bootstrap": "latest"
   }
 }

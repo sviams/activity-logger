@@ -166,6 +166,8 @@ describe('TimeReg repo', function() {
 
         beforeEach(function(done) {
             TimeRegRepo.add(function(successResult) {
+                console.log(successResult);
+                expect(successResult.length).toEqual(8);
                 done();
             }, function(error) {
                 done(error);

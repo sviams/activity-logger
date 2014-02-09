@@ -43,10 +43,11 @@ module.exports.get = function(onSuccess, onError, request) {
     }, function(err) {
         onError(err);
     }, { date: { $gte: startDate, $lt: endDate}, user: request.user.username });
-}
+};
 
 
-module.exports.post = function(onSuccess, onError, period) {
+module.exports.post = function(onSuccess, onError, req) {
+    var period = req.body;
     if (!Utils.isValidDateRange(period.startDate, period.endDate)) {
         return onError("Invalid date range");
     }
@@ -61,13 +62,15 @@ module.exports.post = function(onSuccess, onError, period) {
         var activity = period.activities[activityKey];
         for (var dateKey in activity) {
             var duration = activity[dateKey];
-            if (duration != undefined && duration > 0) {
-                var newReg = new TimeReg(undefined, activityKey, request.user.username, new Date(dateKey), duration, undefined);
+            if (duration !== undefined && duration > 0) {
+                var newReg = new TimeReg(undefined, activityKey, req.user.username, new Date(dateKey), duration, undefined);
                 timeRegs.push(newReg);
             }
         }
     }
 
-    TimeRegRepo.add(onSuccess, onError, timeRegs);
-}
+    TimeRegRepo.add(function() {
+        return Period.get(onSuccess, onError, req);
+    }, onError, timeRegs);
+};
 

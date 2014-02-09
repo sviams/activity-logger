@@ -26,7 +26,6 @@ alControllers.controller('UserListCtrl', ['$scope', 'User', function($scope, Use
     }
 
     $scope.cancelCurrentUser = function() {
-        console.log('Cancel editing current user');
         if ($scope.isNewUser) $scope.users.pop();
         $scope.isNewUser = false;
         $scope.currentUser = undefined;
@@ -34,49 +33,64 @@ alControllers.controller('UserListCtrl', ['$scope', 'User', function($scope, Use
 
 }]);
 
-alControllers.controller('TimeCtrl', ['$scope', '$modal', 'TimeReg', 'Project', 'Period', function($scope, $modal, TimeReg, Project, Period) {
+alControllers.controller('WeekCtrl', ['$scope', '$modal', '$routeParams', '$location', 'Project', 'Period', function($scope, $modal, $routeParams, $location, Project, Period) {
 
     function deltaDate(date, delta) {
         var ms = date.getTime();
         return new Date(ms + (delta * 86400000));
     }
 
+    function isValidDate(input) {
+        return (input != null && input != undefined && !isNaN(Date.parse(input)))
+    }
 
+    function getStartOfWeekForDay(day) {
+        var weekDayIndex = day.getDay() -1;
+        if (weekDayIndex === -1) {
+            weekDayIndex = 6; // Sundays
+        }
+        return deltaDate(day, -weekDayIndex);
+    }
 
-    function initWeek() {
+    $scope.isCurrentWeek = false;
+
+    function initWeek(startDate) {
         weekdayLabels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
         monthLabels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
         $scope.week = []
+
         var today = new Date();
-        var currentWeekdayIndex = today.getDay() -1;
-        if (currentWeekdayIndex === -1) {
-            currentWeekdayIndex = 6; // Sundays
-        }
+        $scope.isCurrentWeek = false;
+
         for (var i = 0; i < 7; i++) {
-            var date = deltaDate(today, i-currentWeekdayIndex);
+            var date = deltaDate(startDate, i);
+            if (date.getDate() === today.getDate()) {
+                $scope.isCurrentWeek = true;
+            }
             $scope.week.push({
                 label: weekdayLabels[i],
                 dateLabel: date.getDate() + " " + monthLabels[date.getMonth()],
                 date: date.toISOString().substring(0, 10),
-                current: i === currentWeekdayIndex,
+                current: date.getDate() === today.getDate(),
                 total: 0
             });
         }
     }
 
-    initWeek();
+    function loadWeek(startDay) {
+        initWeek(startDay);
+        $location.search('startDate', startDay.toISOString().substring(0, 10));
+        $scope.period = Period.get({ startDate: $scope.week[0].date, endDate: $scope.week[$scope.week.length-1].date})
+    }
 
-    $scope.period = Period.get({ startDate: $scope.week[0].date, endDate: $scope.week[$scope.week.length-1].date})
+    function onLoad() {
+        var startDay = isValidDate($routeParams.startDate) ? getStartOfWeekForDay($routeParams.startDate) : getStartOfWeekForDay(new Date());
+        $scope.projects = Project.list();
+        loadWeek(startDay);
+    }
 
-    /*
-    $scope.period = {
-        rows: [],
-        startDate: $scope.week[0].date,
-        endDate: $scope.week[$scope.week.length-1].date
-    };
-    */
+    onLoad();
 
-    $scope.projects = Project.list();
 
     $scope.onAddRow = function() {
 
@@ -92,21 +106,26 @@ alControllers.controller('TimeCtrl', ['$scope', '$modal', 'TimeReg', 'Project', 
 
         modalInstance.result.then(function(result) {
             $scope.period.activities[result.activity] = {}
-            //$scope.period.rows.push({ activity: result.activity, project: result.project, time: new Array(7)});
         });
 
     }
 
     $scope.onSave = function() {
-        Period.save($scope.period);
+        console.log($scope.period);
+        $scope.period.$save().then(console.log($scope.period));
+    }
+
+    $scope.changeWeek = function(deltaWeeks) {
+        var startDay = deltaDate(new Date(Date.parse($scope.week[0].date)), (deltaWeeks * 7));
+        loadWeek(startDay);
+    }
+
+    $scope.goToCurrentWeek = function() {
+        loadWeek(getStartOfWeekForDay(new Date()));
     }
 
     $scope.range = function(num) {
         return new Array(num);
-    }
-
-    $scope.weekDates = function() {
-
     }
 
     $scope.activityName = function(activity) {
@@ -159,8 +178,10 @@ alControllers.controller('TimeCtrl', ['$scope', '$modal', 'TimeReg', 'Project', 
 
     $scope.total = function() {
         var result = 0;
-        for (i in $scope.period.activities) {
-            result += $scope.activityTotal($scope.period.activities[i]);
+        if ($scope.period != undefined) {
+            for (i in $scope.period.activities) {
+                result += $scope.activityTotal($scope.period.activities[i]);
+            }
         }
         return result;
     }
@@ -168,8 +189,6 @@ alControllers.controller('TimeCtrl', ['$scope', '$modal', 'TimeReg', 'Project', 
 }]);
 
 alControllers.controller('ProjectPickerCtrl', ['$scope', '$modalInstance', 'projects', function($scope, $modalInstance, projects) {
-    console.log(projects);
-
     $scope.projects = projects;
 
     $scope.project = projects[0];

@@ -9,12 +9,14 @@ module.exports = function(config){
         files : [
           'bower_components/angular/angular.js',
           'bower_components/angular-resource/angular-resource.js',
+          'bower_components/angular-route/angular-route.js',
+          'bower_components/angular-bootstrap/ui-bootstrap.js',
           'test/lib/angular/angular-mocks.js',
           'public/js/**/*.js',
           'test/unit/client/**/*.js'
         ],
 
-        exclude: ['public/js/lib/angular/angular-scenario.js'],
+        exclude: ['bower_components/angular-scenario/angular-scenario.js'],
 
         autoWatch : true,
 
@@ -27,7 +29,8 @@ module.exports = function(config){
           'karma-junit-reporter',
           'karma-chrome-launcher',
           'karma-firefox-launcher',
-          'karma-jasmine'
+          'karma-jasmine',
+          'karma-spec-reporter'
         ],
 
         junitReporter : {
@@ -35,7 +38,7 @@ module.exports = function(config){
           suite: 'unit'
         },
 
-        reporters: ['coverage'],
+        reporters: ['coverage', 'spec'],
 
         coverageReporter: {
             type: 'html',

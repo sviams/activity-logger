@@ -5,7 +5,7 @@
 var Utils = (function() {
 
     function _isValidDate(input) {
-        return (input != null && input != undefined && !isNaN(Date.parse(input)))
+        return (input !== null && input !== undefined && !isNaN(Date.parse(input)));
     }
 
     function _isValidDateRange(startDate, endDate) {
@@ -21,7 +21,7 @@ var Utils = (function() {
     }
 
     function _isArray(obj) {
-        return obj != undefined && obj != null && Object.prototype.toString.call(obj) === '[object Array]';
+        return obj !== undefined && obj !== null && Object.prototype.toString.call(obj) === '[object Array]';
     }
 
     function _deltaDate(date, delta) {
@@ -33,7 +33,7 @@ var Utils = (function() {
         isValidDate: _isValidDate,
         isValidDateRange: _isValidDateRange,
         deltaDate: _deltaDate
-    }
+    };
 
 })();
 

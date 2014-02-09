@@ -4,8 +4,6 @@
 
 describe('filter', function() {
 
-  beforeEach(module('phonecatFilters'));
-
 
 
 });

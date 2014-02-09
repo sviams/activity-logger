@@ -19,7 +19,7 @@ module.exports = function(grunt) {
                 junitreport: {
                     report: false,
                     savePath: './build/reports/jasmine',
-                    useDotNotation: true,
+                    useDotNotation: false,
                     consolidate: true
                 }
             }

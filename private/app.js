@@ -131,7 +131,7 @@ function logoutFunction(req, res){
 app.get('/login', routes.login);
 app.get('/', authRequired, restrictedToRole(User.Roles.Consultant), routes.index);
 app.get('/admin', authRequired, restrictedToRole(User.Roles.Admin),routes.admin);
-app.get('/time', authRequired, restrictedToRole(User.Roles.Consultant),routes.time);
+app.get('/week', authRequired, restrictedToRole(User.Roles.Consultant),routes.week);
 app.get('/modal/projectpicker', authRequired, restrictedToRole(User.Roles.Consultant),routes.project_picker);
 app.post('/login', authFunction);
 app.get('/logout', logoutFunction);
@@ -199,8 +199,8 @@ function parse(proto) {
         if (data.prototype !== proto) { data.prototype = proto; }
 
         return callback();
-    }
-};
+    };
+}
 
 function parseUser(req, res, next) { User.Parse(req.body, next); }
 app.post('/users/:userId', authRequired, restrictedToRole(User.Roles.Admin), parseUser, execJsonRequest(UserRepo.update));
@@ -218,7 +218,7 @@ app.get('/timereg',          authRequired, restrictedToRole(User.Roles.Consultan
 
 //app.get('/period', authRequired, restrictedToRole(User.Roles.Consultant), execJsonQuery(Period.get));
 app.get('/period', execJsonQuery(Period.get));
-app.post('/period', execJsonRequest(Period.post));
+app.post('/period', execJsonQuery(Period.post));
 
 http.createServer(app).listen(app.get('port'), function(){
     console.log('Express server listening on port ' + app.get('port'));

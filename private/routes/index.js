@@ -24,8 +24,8 @@ exports.login = function(req, res){
     });
 };
 
-exports.time = function(req, res){
-    res.render('time', {
+exports.week = function(req, res){
+    res.render('week', {
         title: 'Current week',
         user: req.user
     });
