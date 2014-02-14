@@ -34,6 +34,14 @@ describe('User model', function() {
         }, validUser);
     });
 
+    it('when empty should seed a new user', function(done) {
+
+        UserRepo.seedUser(function(successResult) {
+            done();
+        }, function(error) {
+            done(error);
+        }, validUser);
+    });
 
     it('should fail to create a user when missing the email field', function(done) {
 

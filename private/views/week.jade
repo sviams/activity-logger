@@ -18,7 +18,11 @@ block content
                                 button(type="button" class="btn btn-default" ng-class="{disabled: isCurrentWeek}" ng-click="goToCurrentWeek()") Current week
                                 button(type="button" class="btn btn-default" ng-click="changeWeek(1)")
                                     span(class="glyphicon glyphicon-chevron-right")
-                        td(class="weekday" ng-repeat="day in week" ng-class="{today: day.current}") {{day.label}} {{day.dateLabel}}
+                        td(class="weekday" ng-repeat="day in week" ng-class="{today: day.current}")
+                            div
+                                strong {{day.label}}
+                            div
+                                small {{day.dateLabel}}
                         td(class="weekday") Total
                         td(class="weekday") &nbsp
                     tfoot(class="table-foot")

@@ -28,11 +28,11 @@ var UserRepo = (function() {
 
     var UserDbModel =  mongoose.model('User', _userSchema);
 
-    function _seedUser(user) {
+    function _seedUser(onSuccess, onError, user) {
 
         if (!user) {
             console.log('User undefined, not seeding');
-            return;
+            return onError();
         }
 
         UserDbModel.find({ username: user.username, role: user.role}, function(err, userResult) {
@@ -40,13 +40,16 @@ var UserRepo = (function() {
                 console.log('Hashing password for ' + user.username);
                 user.hashPassword(function(successResult) {
                     console.log('Seeding database with user ' + user.username + ' and role ' + user.role);
-                    UserRepo.add(function() {}, function() {}, user);
+                    UserRepo.add(onSuccess, onError, user);
                 });
 
             } else {
                 console.log('Already had user ' + user.username + ', no need to seed');
+                return onSuccess();
             }
         });
+
+        return onSuccess();
     }
 
     function _listUsers(onSuccess, onError) {

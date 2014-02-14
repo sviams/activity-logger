@@ -166,8 +166,8 @@ describe('TimeReg repo', function() {
 
         beforeEach(function(done) {
             TimeRegRepo.add(function(successResult) {
-                console.log(successResult);
-                expect(successResult.length).toEqual(8);
+                //console.log(successResult);
+                //expect(successResult.length).toEqual(8);
                 done();
             }, function(error) {
                 done(error);
@@ -219,6 +219,20 @@ describe('TimeReg repo', function() {
             }, function(error) {
                 done(error);
             }, { date: '2025-10-03'});
+        });
+
+        it('should find a known timereg when getting by ID', function(done) {
+            TimeRegRepo.all(function(successResult) {
+                TimeRegRepo.getById(function(success) {
+                    expect(success).toEqual(successResult[0]);
+                    done();
+                }, function(err) {
+                    done(err);
+                }, successResult[0].id);
+            }, function(error) {
+                done(error);
+            }, null);
+
         });
 
     });

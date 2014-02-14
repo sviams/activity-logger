@@ -190,6 +190,7 @@ function execProjectList() {
     };
 }
 
+/*
 function parse(proto) {
     return function(data, callback) {
         if (data === undefined || data === null) { return null; }
@@ -201,8 +202,10 @@ function parse(proto) {
         return callback();
     };
 }
+*/
 
 function parseUser(req, res, next) { User.Parse(req.body, next); }
+
 app.post('/users/:userId', authRequired, restrictedToRole(User.Roles.Admin), parseUser, execJsonRequest(UserRepo.update));
 app.post('/users',         authRequired, restrictedToRole(User.Roles.Admin), parseUser, execJsonRequest(UserRepo.add));
 app.get('/users/:userId',  authRequired, restrictedToRole(User.Roles.Admin), parseUser, execJsonRequest(UserRepo.getById));
@@ -211,12 +214,11 @@ app.get('/users',          authRequired, restrictedToRole(User.Roles.Admin), exe
 app.get('/project/:projectId',      authRequired, restrictedToRole(User.Roles.Consultant), execProjectGet());
 app.get('/project',                 authRequired, restrictedToRole(User.Roles.Consultant), execProjectList());
 
-app.post('/timereg/:regId',  authRequired, restrictedToRole(User.Roles.Consultant), parse(TimeReg), execJsonRequest(TimeRegRepo.update));
-app.post('/timereg',         authRequired, restrictedToRole(User.Roles.Consultant), parse(TimeReg), execJsonRequest(TimeRegRepo.add));
-app.get('/timereg/:regId',   authRequired, restrictedToRole(User.Roles.Consultant), parse(TimeReg), execJsonRequest(TimeRegRepo.getById));
-app.get('/timereg',          authRequired, restrictedToRole(User.Roles.Consultant), execJsonRequest(TimeRegRepo.all));
+//app.post('/timereg/:regId',  authRequired, restrictedToRole(User.Roles.Consultant), parse(TimeReg), execJsonRequest(TimeRegRepo.update));
+//app.post('/timereg',         authRequired, restrictedToRole(User.Roles.Consultant), parse(TimeReg), execJsonRequest(TimeRegRepo.add));
+//app.get('/timereg/:regId',   authRequired, restrictedToRole(User.Roles.Consultant), parse(TimeReg), execJsonRequest(TimeRegRepo.getById));
+//app.get('/timereg',          authRequired, restrictedToRole(User.Roles.Consultant), execJsonRequest(TimeRegRepo.all));
 
-//app.get('/period', authRequired, restrictedToRole(User.Roles.Consultant), execJsonQuery(Period.get));
 app.get('/period', execJsonQuery(Period.get));
 app.post('/period', execJsonQuery(Period.post));
 
